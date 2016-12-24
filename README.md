@@ -4,6 +4,7 @@ CodeGuru Extreme Competition Engine
 http://www.codeguru.co.il/Xtreme/
 
 Travis CI:
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d10ebabcb83f4b5cbcbfc1f251549078)](https://www.codacy.com/app/romik-code/codeguru-extreme?utm_source=github.com&utm_medium=referral&utm_content=codeguru-il/codeguru-extreme&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/scoverage/scalac-scoverage-plugin.svg?branch=master)](https://travis-ci.org/scoverage/scalac-scoverage-plugin)
 
 CodeCov.io:
