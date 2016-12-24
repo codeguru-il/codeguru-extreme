@@ -12,6 +12,10 @@ notifications:
 script:
  - sbt clean coverage test coverageReport
 
+addons:
+    code_climate:
+        repo_token: 17462cc69498a68b59514a880fdb7d2e4ffc2bfe3626c7f1dfb2c82ff0d51fd9
+
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t 97c86ea6-f0aa-422f-a1e9-5081816406fb
   - vendor/bin/test-reporter
