@@ -4,7 +4,7 @@ CodeGuru Extreme Competition Engine
 http://www.codeguru.co.il/Xtreme/
 
 Travis CI:
-[![Build Status](https://travis-ci.org/scoverage/scalac-scoverage-plugin.svg?branch=master)](https://travis-ci.org/scoverage/scalac-scoverage-plugin)
+[![Build Status](https://travis-ci.org/codeguru-il/codeguru-extreme.svg?branch=master)](https://travis-ci.org/codeguru-il/codeguru-extreme#)
 
 CodeCov.io:
 [![codecov](https://codecov.io/gh/codeguru-il/codeguru-extreme/branch/master/graph/badge.svg)](https://codecov.io/gh/codeguru-il/codeguru-extreme)
