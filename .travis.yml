@@ -31,4 +31,5 @@ after_success:
   - vendor/bin/test-reporter
   - sbt coveralls
   - sbt scalastyle
+  - sbt coverageReport
 
