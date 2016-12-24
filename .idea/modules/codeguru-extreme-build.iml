@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="codeguru-extreme-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="_root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scoverage.ScoverageSbtPlugin, _root_.scoverage.ScoverageSbtPlugin.autoImport._, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /home/romi/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="codeguru-extreme-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="_root_.org.scalastyle.sbt.ScalastylePlugin._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.scoverage.ScoverageSbtPlugin, _root_.scoverage.ScoverageSbtPlugin.autoImport._, sbt._, Keys._, dsl._" sbt.resolvers="https://repo1.maven.org/maven2/|maven|public, /home/romi/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../../project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../project/target/idea-test-classes" />
@@ -14,7 +14,11 @@
     <orderEntry type="module-library">
       <library name="SBT: sbt-and-plugins">
         <CLASSES>
+          <root url="jar://$USER_HOME$/.ivy2/cache/com.typesafe/config/bundles/config-1.2.0.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scalariform/scalariform_2.10/jars/scalariform_2.10-0.1.7.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scalastyle/scalastyle_2.10/jars/scalastyle_2.10-0.8.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scoverage/scalac-scoverage-plugin_2.10/jars/scalac-scoverage-plugin_2.10-1.3.0.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scalastyle/scalastyle-sbt-plugin/jars/scalastyle-sbt-plugin-0.8.0.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scoverage/sbt-scoverage/jars/sbt-scoverage-1.5.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.6/lib/jansi.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.10.6/lib/jline.jar!/" />
@@ -76,6 +80,7 @@
         <SOURCES>
           <root url="jar://$USER_HOME$/.ivy2/cache/com.jcraft/jsch/srcs/jsch-0.1.50-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/com.thoughtworks.paranamer/paranamer/srcs/paranamer-2.6-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/com.typesafe/config/srcs/config-1.2.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/jline/jline/srcs/jline-2.13-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.fusesource.jansi/jansi/srcs/jansi-1.11-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.json4s/json4s-ast_2.10/srcs/json4s-ast_2.10-3.2.10-sources.jar!/" />
@@ -124,9 +129,12 @@
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-sbt/tracking/srcs/tracking-0.13.13-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scala-tools.sbinary/sbinary_2.10/srcs/sbinary_2.10-0.4.2-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scalamacros/quasiquotes_2.10/srcs/quasiquotes_2.10-2.0.1-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scalariform/scalariform_2.10/srcs/scalariform_2.10-0.1.7-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/org.scalastyle/scalastyle_2.10/srcs/scalastyle_2.10-0.8.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.scoverage/scalac-scoverage-plugin_2.10/srcs/scalac-scoverage-plugin_2.10-1.3.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.spire-math/jawn-parser_2.10/srcs/jawn-parser_2.10-0.6.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/org.spire-math/json4s-support_2.10/srcs/json4s-support_2.10-0.6.0-sources.jar!/" />
+          <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scalastyle/scalastyle-sbt-plugin/srcs/scalastyle-sbt-plugin-0.8.0-sources.jar!/" />
           <root url="jar://$USER_HOME$/.ivy2/cache/scala_2.10/sbt_0.13/org.scoverage/sbt-scoverage/srcs/sbt-scoverage-1.5.0-sources.jar!/" />
         </SOURCES>
       </library>

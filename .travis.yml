@@ -1,3 +1,17 @@
+# Use container-based infrastructure
+sudo: false
+
+# These directories are cached to S3 at the end of the build
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+
+before_cache:
+  # Tricks to avoid unnecessary cache updates
+  - find $HOME/.ivy2 -name "ivydata-*.properties" -delete
+  - find $HOME/.sbt -name "*.lock" -delete
+
 language: scala
 
 jdk:
@@ -6,16 +20,15 @@ jdk:
 scala:
    - 2.12.1
 
+script:
+   - sbt ++$TRAVIS_SCALA_VERSION test
+   - sbt clean coverage test coverageReport
+
 notifications:
   slack: codeguru-il:ib2i4YtS2JSkO6mDzo4blcT6
-
-script:
- - sbt clean coverage test coverageReport
-
-addons:
-    code_climate:
-        repo_token: 17462cc69498a68b59514a880fdb7d2e4ffc2bfe3626c7f1dfb2c82ff0d51fd9
 
 after_success:
   - bash <(curl -s https://codecov.io/bash) -t 97c86ea6-f0aa-422f-a1e9-5081816406fb
   - vendor/bin/test-reporter
+  - sbt coveralls
+
