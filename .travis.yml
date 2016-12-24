@@ -1,0 +1,4 @@
+language: scala
+
+notifications:
+  slack: codeguru-il:ib2i4YtS2JSkO6mDzo4blcT6
