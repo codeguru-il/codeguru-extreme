@@ -21,8 +21,7 @@ scala:
    - 2.12.1
 
 script:
-   - sbt ++$TRAVIS_SCALA_VERSION test
-   - sbt clean coverage test coverageReport
+   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
 
 notifications:
   slack: codeguru-il:ib2i4YtS2JSkO6mDzo4blcT6
@@ -31,4 +30,5 @@ after_success:
   - bash <(curl -s https://codecov.io/bash) -t 97c86ea6-f0aa-422f-a1e9-5081816406fb
   - vendor/bin/test-reporter
   - sbt coveralls
+  - sbt scalastyle
 
