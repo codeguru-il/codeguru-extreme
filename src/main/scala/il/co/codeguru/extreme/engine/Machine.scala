@@ -15,6 +15,8 @@
 // limitations under the License.
 package il.co.codeguru.extreme.engine
 
+import il.co.codeguru.extreme.engine.MachineInstructionOpcode.OperationCode
+
 /**
   *
   * @author Romi Kuntsman <romik.code@gmail.com>
@@ -22,22 +24,41 @@ package il.co.codeguru.extreme.engine
   */
 
 class Machine() {
-  val listener: MemoryAccessListener = ???
-  val activeCpu: Cpu = ???
+  var activeCpu: Cpu = _
   var memory: RealModeMemory = _
 
-  def boot(memoryBytes: Vector[Byte]): Unit = {
+  def boot(memoryBytes: Vector[Byte], listener: MemoryAccessListener): Unit = {
     memory = RealModeMemoryImpl(memoryBytes, listener)
   }
 
+  def setActiveCpu(cpu: Cpu): Unit = {
+    activeCpu = cpu
+  }
+
   /**
+    * Fetch next opcode and execute it
+    *
     * @return execution time
     */
-  def doNextOpcode(): Int = {
+  def runNextOpcode(): Int = {
+    runOpcode(fetchNextOpcode())
+  }
+
+  /**
+    * Execute given opcode
+    *
+    * @return execution time
+    */
+  def runOpcode(opcode: OperationCode): Int = {
+    activeCpu.runOperation(opcode)
+  }
+
+  /**
+    * @return next operation code, fetched from memory, using active cpu
+    */
+  def fetchNextOpcode(): OperationCode = {
     val opcodeFetcher: OpcodeFetcher = new OpcodeFetcher(activeCpu)
     val machineInstructionDecoder: MachineInstructionDecoder = new MachineInstructionDecoder(activeCpu, opcodeFetcher)
-
-    val opcode = machineInstructionDecoder.decode()
-    activeCpu.runOperation(opcode)
+    machineInstructionDecoder.decode()
   }
 }
