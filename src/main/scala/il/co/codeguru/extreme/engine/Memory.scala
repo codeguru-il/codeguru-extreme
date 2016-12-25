@@ -77,6 +77,12 @@ trait MemoryAccessListener {
   def writeMemory(address: RealModeAddress, value: Byte8Bits)
 }
 
+object NullMemoryAccessListener extends MemoryAccessListener {
+  override def readMemory(address: RealModeAddress, value: Byte8Bits, execute: Boolean): Unit = {}
+
+  override def writeMemory(address: RealModeAddress, value: Byte8Bits): Unit = {}
+}
+
 case class RealModeMemoryImpl(memoryBytes: Vector[Byte], listener: MemoryAccessListener) extends AbstractRealModeMemory {
   // init memory
   def this(listener: MemoryAccessListener) = this(Vector.fill(RealModeAddress.MEMORY_SIZE)(RealModeAddress.MEMORY_FILL_BYTE), listener)
