@@ -18,9 +18,6 @@ package il.co.codeguru.extreme.engine
 
 import org.scalatest.FunSuite
 
-import scala.collection.mutable.ListBuffer
-
-
 class RealModeAddressTest extends FunSuite {
 
   // Create memory locations for the tests to use.
