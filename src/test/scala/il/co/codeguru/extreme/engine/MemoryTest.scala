@@ -18,29 +18,53 @@ package il.co.codeguru.extreme.engine
 
 import org.scalatest.FunSuite
 
+import scala.collection.mutable.ListBuffer
+
+
 class RealModeAddressTest extends FunSuite {
 
+  // Create memory locations for the tests to use.
+  var memoryLocations = new ListBuffer[(Int, Int)]()
+  for (segment <- 0x0 to 0x10) {
+    for (offset <- 0x0 to 0x10) {
+      memoryLocations.+=((segment, offset))
+    }
+  }
+
   test("Linear address from segment and offset") {
-    val seg: Int = 0x12
-    val offset: Int = 0x05
-    val linearAddress = seg * 0x10 + offset
+    for((segment, offset) <- memoryLocations) {
+      val linearAddress = segment * 0x10 + offset
 
-    val addr = new RealModeAddress(seg, offset)
+      val addr = new RealModeAddress(segment, offset)
 
-    assert(addr.segment == seg)
-    assert(addr.offset == offset)
-    assert(addr.linearAddress == linearAddress)
+      assert(addr.segment == segment)
+      assert(addr.offset == offset)
+      assert(addr.linearAddress == linearAddress)
+    }
   }
 
   test("Segment and offset from linear address") {
-    val seg: Int = 0x12
-    val offset: Int = 0x05
-    val linearAddress = seg * 0x10 + offset
+    for((segment, offset) <- memoryLocations) {
+      val linearAddress = segment * 0x10 + offset
 
-    val addr = new RealModeAddress(linearAddress)
-    assert(addr.segment == seg)
-    assert(addr.offset == offset)
-    assert(addr.linearAddress == linearAddress)
+      val addr = new RealModeAddress(linearAddress)
+      assert(addr.segment == segment)
+      assert(addr.offset == offset)
+      assert(addr.linearAddress == linearAddress)
+    }
+  }
+
+  test("Different segment and offset from the same linear address") {
+    for((segment, offset) <- memoryLocations) {
+      val segment1 = segment + 0x1
+      val offset1 = offset
+      val segment2 = segment1 - 0x1
+      val offset2 = offset1 + 0x10
+
+      val addr1 = new RealModeAddress(segment1, offset1)
+      val addr2 = new RealModeAddress(segment2, offset2)
+      assert(addr1.linearAddress == addr2.linearAddress)
+    }
   }
 }
 
