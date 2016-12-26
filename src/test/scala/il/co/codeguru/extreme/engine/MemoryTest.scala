@@ -31,30 +31,25 @@ class RealModeAddressTest extends FunSuite {
     }
   }
 
-  test("Linear address from segment and offset") {
+  test("Segment and offset are saved in the address object") {
     for((segment, offset) <- memoryLocations) {
-      val linearAddress = segment * 0x10 + offset
-
       val addr = new RealModeAddress(segment, offset)
 
       assert(addr.segment == segment)
       assert(addr.offset == offset)
-      assert(addr.linearAddress == linearAddress)
     }
   }
 
-  test("Segment and offset from linear address") {
+  test("Linear address from segment and offset is calculated well") {
     for((segment, offset) <- memoryLocations) {
       val linearAddress = segment * 0x10 + offset
+      val addr = new RealModeAddress(segment, offset)
 
-      val addr = new RealModeAddress(linearAddress)
-      assert(addr.segment == segment)
-      assert(addr.offset == offset)
       assert(addr.linearAddress == linearAddress)
     }
   }
 
-  test("Different segment and offset from the same linear address") {
+  test("Same linear address is calculated from different segment and offsets") {
     for((segment, offset) <- memoryLocations) {
       val segment1 = segment + 0x1
       val offset1 = offset
@@ -64,6 +59,26 @@ class RealModeAddressTest extends FunSuite {
       val addr1 = new RealModeAddress(segment1, offset1)
       val addr2 = new RealModeAddress(segment2, offset2)
       assert(addr1.linearAddress == addr2.linearAddress)
+    }
+  }
+
+  test("Offset is cyclic") {
+    for((segment, offset) <- memoryLocations) {
+      val addr1 = new RealModeAddress(segment, offset + 0xffff)
+      val addr2 = new RealModeAddress(segment, offset - 0x1)
+
+      assert(addr1.segment == addr2.segment)
+      assert(addr1.offset == addr2.offset)
+    }
+  }
+
+  test("Segment is cyclic") {
+    for((segment, offset) <- memoryLocations) {
+      val addr1 = new RealModeAddress(segment + 0xffff, offset)
+      val addr2 = new RealModeAddress(segment - 0x1, offset)
+
+      assert(addr1.segment == addr2.segment)
+      assert(addr1.offset == addr2.offset)
     }
   }
 }
