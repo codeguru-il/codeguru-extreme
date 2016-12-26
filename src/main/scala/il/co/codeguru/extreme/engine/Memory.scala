@@ -25,20 +25,16 @@ object RealModeAddress {
   val MEMORY_FILL_BYTE: Byte = 0xCC.toByte
 }
 
-class RealModeAddress(val linearAddress: Int) {
-  /** 16-bit real-mode segment */
-  val segment: Int = Unsigned.unsignedShort(linearAddress / RealModeAddress.PARAGRAPH_SIZE)
+case class RealModeAddress(segmentRaw: Word16Bits, offsetRaw: Word16Bits) {
+  val segment: Word16Bits = Unsigned.unsignedShort(segmentRaw)
 
-  /** 16-bit real-mode offset */
-  val offset: Int = linearAddress % RealModeAddress.PARAGRAPH_SIZE
+  val offset: Word16Bits = Unsigned.unsignedShort(offsetRaw)
 
-  def this(segmentParam: Int, offsetParam: Int) = {
-    this(Unsigned.unsignedShort(segmentParam) * RealModeAddress.PARAGRAPH_SIZE + Unsigned.unsignedShort(offsetParam))
-  }
+  val linearAddress: Int = segment * RealModeAddress.PARAGRAPH_SIZE + offset
 
-  def addOffset(offset: Int): RealModeAddress = new RealModeAddress(this.linearAddress + offset)
+  def addOffset(offsetDelta: Int): RealModeAddress = new RealModeAddress(this.segment, this.offset + offsetDelta)
 
-  override def toString: String = f"[$segment%#04x:$offset%#04x]~[$linearAddress%d]"
+  override def toString: String = f"[$segment%#04x:$offset%#04x]"
 }
 
 trait RealModeMemory {
