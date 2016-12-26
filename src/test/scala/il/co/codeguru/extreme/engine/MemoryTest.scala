@@ -24,16 +24,14 @@ import scala.collection.mutable.ListBuffer
 class RealModeAddressTest extends FunSuite {
 
   // Create memory locations for the tests to use.
-  var memoryLocations = new ListBuffer[(Int, Int)]()
-  for (segment <- 0x0 to 0x10) {
-    for (offset <- 0x0 to 0x10) {
-      memoryLocations.+=((segment, offset))
-    }
-  }
+  val memoryLocations: Seq[(Word16Bits, Word16Bits)] =
+    for (segment <- 0x0 to 0x10;
+         offset <- 0x0 to RealModeAddress.PARAGRAPHS_IN_SEGMENT)
+      yield (segment, offset)
 
   test("Segment and offset are saved in the address object") {
-    for((segment, offset) <- memoryLocations) {
-      val addr = new RealModeAddress(segment, offset)
+    for ((segment, offset) <- memoryLocations) {
+      val addr = RealModeAddress(segment, offset)
 
       assert(addr.segment == segment)
       assert(addr.offset == offset)
@@ -41,31 +39,31 @@ class RealModeAddressTest extends FunSuite {
   }
 
   test("Linear address from segment and offset is calculated well") {
-    for((segment, offset) <- memoryLocations) {
+    for ((segment, offset) <- memoryLocations) {
       val linearAddress = segment * 0x10 + offset
-      val addr = new RealModeAddress(segment, offset)
+      val addr = RealModeAddress(segment, offset)
 
       assert(addr.linearAddress == linearAddress)
     }
   }
 
   test("Same linear address is calculated from different segment and offsets") {
-    for((segment, offset) <- memoryLocations) {
+    for ((segment, offset) <- memoryLocations) {
       val segment1 = segment + 0x1
       val offset1 = offset
       val segment2 = segment1 - 0x1
       val offset2 = offset1 + 0x10
 
-      val addr1 = new RealModeAddress(segment1, offset1)
-      val addr2 = new RealModeAddress(segment2, offset2)
+      val addr1 = RealModeAddress(segment1, offset1)
+      val addr2 = RealModeAddress(segment2, offset2)
       assert(addr1.linearAddress == addr2.linearAddress)
     }
   }
 
   test("Offset is cyclic") {
-    for((segment, offset) <- memoryLocations) {
-      val addr1 = new RealModeAddress(segment, offset + 0xffff)
-      val addr2 = new RealModeAddress(segment, offset - 0x1)
+    for ((segment, offset) <- memoryLocations) {
+      val addr1 = RealModeAddress(segment, offset + 0xffff)
+      val addr2 = RealModeAddress(segment, offset - 0x1)
 
       assert(addr1.segment == addr2.segment)
       assert(addr1.offset == addr2.offset)
@@ -73,9 +71,9 @@ class RealModeAddressTest extends FunSuite {
   }
 
   test("Segment is cyclic") {
-    for((segment, offset) <- memoryLocations) {
-      val addr1 = new RealModeAddress(segment + 0xffff, offset)
-      val addr2 = new RealModeAddress(segment - 0x1, offset)
+    for ((segment, offset) <- memoryLocations) {
+      val addr1 = RealModeAddress(segment + 0xffff, offset)
+      val addr2 = RealModeAddress(segment - 0x1, offset)
 
       assert(addr1.segment == addr2.segment)
       assert(addr1.offset == addr2.offset)
