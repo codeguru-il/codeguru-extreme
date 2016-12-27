@@ -21,16 +21,28 @@ scala:
    - 2.12.1
 
 script:
-   - sbt ++$TRAVIS_SCALA_VERSION clean coverage test coverageReport
+   - sbt ++$TRAVIS_SCALA_VERSION clean test
 
 notifications:
   slack: codeguru-il:ib2i4YtS2JSkO6mDzo4blcT6
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
   - vendor/bin/test-reporter
   - sbt coveralls
   - sbt scalastyle
   - sbt coverageReport
+
+  # Codacy
   - sbt codacyCoverage
 
+  # CodeCov.io
+  - sbt coverage
+  - bash <(curl -s https://codecov.io/bash)
+
+# CodeCov.io -> Slack
+coverage:
+  notify:
+    slack:
+      default:
+        url: "https://hooks.slack.com/services/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"
+        threshold: 1%
