@@ -26,3 +26,8 @@ License:
 ## Requirements
  - [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
  - [Scala 2.12.1](http://scala-lang.org/download/2.12.1.html)
+
+## Documentation
+ - [Intel 806 Family User's Manual (October 1979)](https://github.com/codeguru-il/codeguru-extreme/raw/master/doc/9800722-03_The_8086_Family_Users_Manual_Oct79.pdf)
+ 
+ See [Git Large File Storage (LFS)](https://git-lfs.github.com/) for details
