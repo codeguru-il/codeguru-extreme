@@ -62,26 +62,25 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
     }
 
     regOrMemIndex match {
-      case 0 => newAddress(DS, (m_state.bx + m_state.si + displacement).toShort)
-      case 1 => newAddress(DS, (m_state.bx + m_state.di + displacement).toShort)
-      case 2 => newAddress(SS, (m_state.bp + m_state.si + displacement).toShort)
-      case 3 => newAddress(SS, (m_state.bp + m_state.di + displacement).toShort)
-      case 4 => newAddress(DS, (m_state.si + displacement).toShort)
-      case 5 => newAddress(DS, (m_state.di + displacement).toShort)
+      case 0 => newAddress(DS, m_state.bx + m_state.si + displacement)
+      case 1 => newAddress(DS, m_state.bx + m_state.di + displacement)
+      case 2 => newAddress(SS, m_state.bp + m_state.si + displacement)
+      case 3 => newAddress(SS, m_state.bp + m_state.di + displacement)
+      case 4 => newAddress(DS, m_state.si + displacement)
+      case 5 => newAddress(DS, m_state.di + displacement)
       case 6 => if (mode == 0) {
         newAddress(DS, m_fetcher.nextWord)
       }
       else {
-        newAddress(SS, (m_state.bp + displacement).toShort)
+        newAddress(SS, m_state.bp + displacement)
       }
-      case 7 => newAddress(DS, (m_state.bx + m_fetcher.nextByte).toShort)
+      case 7 => newAddress(DS, m_state.bx + displacement)
     }
   }
 
   def newAddress(segIndex: SegmentRegister, offset: Int): RealModeAddress = {
-    val segment: Int = m_state.getRegister(if (forcedSegReg.isDefined) {
-      forcedSegReg.get
-    } else segIndex)
+    val segmentRegister = if (forcedSegReg.isDefined) forcedSegReg.get else segIndex
+    val segment: Int = m_state.getRegister(segmentRegister)
     new RealModeAddress(segment, offset)
   }
 
@@ -103,30 +102,6 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
   }
 
   def getReg16: Reg16Operand = Reg16Operand(Register.getReg16(regIndex))
-
-  /*
-  def setReg8(value: Byte) {
-    m_regs.setReg8(m_regIndex, value)
-  }
-
-  def setMem8(value: Byte) {
-    if (m_memAddress != null) m_memory.writeByte(m_memAddress, value)
-    else m_regs.setReg8(m_memIndex, value)
-  }
-
-  def setReg16(value: Short) {
-    m_regs.setReg16(m_regIndex, value)
-  }
-
-  def setSeg(value: Short) {
-    m_regs.setSeg(m_regIndex, value)
-  }
-
-  def setMem16(value: Short) {
-    if (m_memAddress != null) m_memory.writeWord(m_memAddress, value)
-    else m_regs.setReg16(m_memIndex, value)
-  }
-  */
 
   def getSeg: Reg16Operand = Reg16Operand(Register.getSeg(regIndex))
 

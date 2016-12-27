@@ -20,9 +20,11 @@ package object engine {
   type Byte8Bits = Short
   type Word16Bits = Int
 
-  def byte8Bits(value: Byte): Byte8Bits = value.toShort
+  def byte8Bits(value: Short): Byte8Bits = Unsigned.unsignedByte(value)
 
-  def word16Bits(value: Short): Word16Bits = value.toInt
+  def byte8Bits(value: Byte): Byte8Bits = Unsigned.unsignedByte(value.toShort)
+
+  def word16Bits(value: Short): Word16Bits = Unsigned.unsignedShort(value)
 
   object Unsigned {
     def unsignedByte(num: Short): Short = (num.toShort & 0xFF).toShort

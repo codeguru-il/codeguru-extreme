@@ -27,6 +27,54 @@ import org.scalatest.FunSuite
 
 class MachineTest extends FunSuite {
 
+  test("mov [bx],al") {
+    val program = Vector(
+      0x88, 0x07         // 00000005  8807              mov [bx],al
+    )
+
+    val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
+
+    assert(cpu.state.ip == 0x00000000)
+    val opcode = machine.fetchNextOpcode()
+
+    assert(cpu.state.ip == 0x00000002)
+  }
+
+  test("Bomber: simplest survivor") {
+    val program = Vector(
+      0xB0, 0xCC,         // 00000000  B0CC              mov al,0xcc
+      0xBB, 0x00, 0x00,   // 00000002  BB0000            mov bx,0x0
+      0x88, 0x07,         // 00000005  8807              mov [bx],al
+      0x43,               // 00000007  43                inc bx
+      0xEB, 0xFB          // 00000008  EBFB              jmp short 0x5
+    )
+
+    val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
+
+    assert(cpu.state.ip == 0x00000000)
+    val opcode1 = machine.fetchNextOpcode()
+    val value1: Short = 0xCC
+    assert(opcode1 == MOV(Reg8Operand(AL), Immed8Operand(byte8Bits(value1))))
+
+    assert(cpu.state.ip == 0x00000002)
+    val opcode2 = machine.fetchNextOpcode()
+    val value2: Short = 0x00
+    assert(opcode2 == MOV(Reg16Operand(BX), Immed16Operand(word16Bits(value2))))
+
+    assert(cpu.state.ip == 0x00000005)
+    val opcode3 = machine.fetchNextOpcode()
+    // FixMe: assert(opcode3 == MOV(NearLabelOperand(Reg16Operand(BX)), Reg8Operand(AL)))
+
+    assert(cpu.state.ip == 0x00000007)
+    val opcode4 = machine.fetchNextOpcode()
+    assert(opcode4 == INC(Reg16Operand(BX)))
+
+    assert(cpu.state.ip == 0x00000008)
+    val opcode5 = machine.fetchNextOpcode()
+    val value5: Short = 0x5
+    // FixMe: assert(opcode5 == JMP(ShortLabelOperand(byte8Bits(value5))))
+  }
+
   test("Execute and validate state: mov ax,42; mov bx,ax") {
     val program = Vector(0xB8, 0x2A, 0x00, 0x89, 0xC3)
     val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
