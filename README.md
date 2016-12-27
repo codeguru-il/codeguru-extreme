@@ -28,6 +28,18 @@ License:
  - [Scala 2.12.1](http://scala-lang.org/download/2.12.1.html)
 
 ## Documentation
+
+See [Git Large File Storage (LFS)](https://git-lfs.github.com/) for details
+
  - [Intel 806 Family User's Manual (October 1979)](https://github.com/codeguru-il/codeguru-extreme/raw/master/doc/9800722-03_The_8086_Family_Users_Manual_Oct79.pdf)
- 
- See [Git Large File Storage (LFS)](https://git-lfs.github.com/) for details
+  - Page 2-30: Section 2.7 Instruction Set
+   - Page 2-49: Table 2-17. Key to Instruction Coding Formats
+   - Page 2-50: Table 2-19. Key to Operand Types
+   - Page 2-51: Table 2-21. Instruction Set Reference Data
+  - Page 2-68: Section 2.8 Addressing Modes
+  - Page 4-1: Section 4.2 8086 and 8088 CPUs
+   - Page 4-20: Table 4-8. MOD (Mode) Field Encoding
+   - Page 4-20: Table 4-9. REG (Register) Field Encoding
+   - Page 4-20: Table 4-10. R/M (Register/Memory) Field Encoding
+   - Page 4-22: Table 4-12. 8086 Instruction Encoding
+   - Page 4-27: Table 4-13. Machine Instruction Decoding Guide
