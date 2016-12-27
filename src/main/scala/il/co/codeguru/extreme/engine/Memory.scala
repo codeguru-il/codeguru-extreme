@@ -53,16 +53,16 @@ abstract class AbstractRealModeMemory extends RealModeMemory {
     val low = readByte(address, execute)
 
     // read high byte
-    val nextAddress: RealModeAddress = new RealModeAddress(address.segment, (address.offset + 1).toShort)
+    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + 1)
     val high = readByte(nextAddress, execute)
 
     word16Bits(((Unsigned.unsignedByte(high) << 8) | Unsigned.unsignedByte(low)).toShort)
   }
 
   def writeWord(address: RealModeAddress, value: Word16Bits): RealModeMemory = {
-    val low: Byte = value.toByte
-    val high: Byte = (value >> 8).toByte
-    val nextAddress: RealModeAddress = new RealModeAddress(address.segment, (address.offset + 1).toShort)
+    val low: Byte8Bits = byte8Bits(value.toByte)
+    val high: Byte8Bits = byte8Bits((value >> 8).toByte)
+    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + 1)
     writeByte(address, low).writeByte(nextAddress, high)
   }
 }
@@ -81,14 +81,15 @@ object NullMemoryAccessListener extends MemoryAccessListener {
 
 case class RealModeMemoryImpl(memoryBytes: Vector[Byte], listener: MemoryAccessListener) extends AbstractRealModeMemory {
   // init memory
-  def this(listener: MemoryAccessListener) = this(Vector.fill(RealModeAddress.MEMORY_SIZE)(RealModeAddress.MEMORY_FILL_BYTE), listener)
+  def this(listener: MemoryAccessListener) =
+    this(Vector.fill(RealModeAddress.MEMORY_SIZE)(RealModeAddress.MEMORY_FILL_BYTE), listener)
 
   def readByte(address: RealModeAddress, execute: Boolean): Byte8Bits = {
-    val value: Byte = memoryBytes(address.linearAddress)
+    val value: Byte8Bits = byte8Bits(memoryBytes(address.linearAddress))
 
     listener.readMemory(address, value, execute)
 
-    byte8Bits(value)
+    value
   }
 
   def writeByte(address: RealModeAddress, value: Byte8Bits): RealModeMemory = {
