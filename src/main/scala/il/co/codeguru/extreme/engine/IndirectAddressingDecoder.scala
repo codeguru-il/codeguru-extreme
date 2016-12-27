@@ -17,6 +17,7 @@ package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode._
 import il.co.codeguru.extreme.engine.Register._
+import il.co.codeguru.extreme.engine.datatypes.M86Word
 
 /**
   * Decoder for MOD + REG + REG/MEM encoding in Cpu instructions
@@ -78,9 +79,9 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
     }
   }
 
-  def newAddress(segIndex: SegmentRegister, offset: Int): RealModeAddress = {
-    val segmentRegister = if (forcedSegReg.isDefined) forcedSegReg.get else segIndex
-    val segment: Int = m_state.getRegister(segmentRegister)
+  def newAddress(segIndex: SegmentRegister, offset: M86Word): RealModeAddress = {
+    val segmentRegister = forcedSegReg.getOrElse(segIndex)
+    val segment: M86Word = m_state.getRegister16(segmentRegister)
     new RealModeAddress(segment, offset)
   }
 
@@ -90,8 +91,6 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
 
   def getMem8: Option[Mem8Operand] = if (isMemDefined) Some(Mem8Operand(memAddress.get)) else None
 
-  def isMemDefined: Boolean = memAddress.isDefined
-
   def getRegOrMem8: RegisterOrMemoryOperand = {
     if (isMemDefined) {
       Mem8Operand(memAddress.get)
@@ -100,6 +99,8 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
       Reg8Operand(Register.getReg8(regOrMemIndex))
     }
   }
+
+  def isMemDefined: Boolean = memAddress.isDefined
 
   def getReg16: Reg16Operand = Reg16Operand(Register.getReg16(regIndex))
 
@@ -130,12 +131,10 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
     repeatWhileEqual = Some(false)
   }
 
-  def newAddress(segIndex: SegmentRegister, baseReg: Register, indexReg: Register): RealModeAddress = {
-    val segment: Int = m_state.getRegister(if (forcedSegReg.isDefined) {
-      forcedSegReg.get
-    } else segIndex)
-    val offsetBase: Int = m_state.getRegister(baseReg)
-    val offsetIndex: Int = m_state.getRegister(indexReg)
+  def newAddress(segIndex: SegmentRegister, baseReg: WordRegister, indexReg: WordRegister): RealModeAddress = {
+    val segment: M86Word = m_state.getRegister16(forcedSegReg.getOrElse(segIndex))
+    val offsetBase: M86Word = m_state.getRegister16(baseReg)
+    val offsetIndex: M86Word = m_state.getRegister16(indexReg)
     new RealModeAddress(segment, offsetBase + offsetIndex)
   }
 }

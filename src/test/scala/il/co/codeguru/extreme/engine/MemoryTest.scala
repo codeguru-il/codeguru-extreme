@@ -16,15 +16,16 @@
 
 package il.co.codeguru.extreme.engine
 
+import il.co.codeguru.extreme.engine.datatypes.M86Word
 import org.scalatest.FunSuite
 
 class RealModeAddressTest extends FunSuite {
 
   // Create memory locations for the tests to use.
-  val memoryLocations: Seq[(Word16Bits, Word16Bits)] =
+  val memoryLocations: Seq[(M86Word, M86Word)] =
     for (segment <- 0x0 to 0x10;
          offset <- 0x0 to RealModeAddress.PARAGRAPHS_IN_SEGMENT)
-      yield (segment, offset)
+      yield (M86Word(segment), M86Word(offset))
 
   test("Segment and offset are saved in the address object") {
     for ((segment, offset) <- memoryLocations) {
@@ -37,7 +38,7 @@ class RealModeAddressTest extends FunSuite {
 
   test("Linear address from segment and offset is calculated well") {
     for ((segment, offset) <- memoryLocations) {
-      val linearAddress = segment * 0x10 + offset
+      val linearAddress: M86Word = segment * 0x10 + offset
       val addr = RealModeAddress(segment, offset)
 
       assert(addr.linearAddress == linearAddress)

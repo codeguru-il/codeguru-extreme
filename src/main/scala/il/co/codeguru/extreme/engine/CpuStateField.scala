@@ -122,7 +122,7 @@ object Register extends StateField {
 
   case object IP extends WordRegister("Instruction Pointer")
 
-  case object Flags extends ByteRegister("Flags")
+  case object Flags extends WordRegister("Flags")
 
 }
 

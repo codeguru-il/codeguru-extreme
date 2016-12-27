@@ -13,27 +13,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+package il.co.codeguru.extreme.engine.datatypes
 
-package il.co.codeguru.extreme
+/**
+  *
+  * @author romi
+  * @since 2016-12-27.
+  */
 
-package object engine {
-  type Byte8Bits = Short
-  type Word16Bits = Int
-
-  def byte8Bits(value: Short): Byte8Bits = Unsigned.unsignedByte(value)
-
-  def byte8Bits(value: Byte): Byte8Bits = Unsigned.unsignedByte(value.toShort)
-
-  def word16Bits(value: Short): Word16Bits = Unsigned.unsignedShort(value)
-
-  object Unsigned {
-    def unsignedByte(num: Short): Short = (num.toShort & 0xFF).toShort
-
-    def unsignedShort(num: Short): Int = unsignedShort(num.toInt)
-
-    def unsignedShort(num: Int): Int = num & 0xFFFF
-
-    def unsignedInt(num: Int): Long = num.toLong & 0xFFFFFFFF
-  }
-
+case class M86Pointer(var value: Long) extends AnyVal {
+  ???
 }

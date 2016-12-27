@@ -17,6 +17,7 @@
 package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.Register._
+import il.co.codeguru.extreme.engine.datatypes.{M86Byte, M86Word}
 
 /**
   * Operation codes (aka Opcodes) with their respective parameters
@@ -53,11 +54,11 @@ object MachineInstructionOpcode {
 
   case class AccumulatorOperand(register: Register) extends Operand
 
-  case class Immed8Operand(value: Byte8Bits) extends ImmediateOperand
+  case class Immed8Operand(value: M86Byte) extends ImmediateOperand
 
-  case class Immed16Operand(value: Word16Bits) extends ImmediateOperand
+  case class Immed16Operand(value: M86Word) extends ImmediateOperand
 
-  case class ShortLabelOperand(offset: Byte8Bits) extends LabelOperand
+  case class ShortLabelOperand(offset: M86Byte) extends LabelOperand
 
   case class NearLabelOperand(offset: Operand) extends LabelOperand
 
