@@ -38,11 +38,3 @@ after_success:
   # CodeCov.io
   - sbt coverage
   - bash <(curl -s https://codecov.io/bash)
-
-# CodeCov.io -> Slack
-coverage:
-  notify:
-    slack:
-      default:
-        url: "https://hooks.slack.com/services/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"
-        threshold: 1%
