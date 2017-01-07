@@ -175,53 +175,53 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
         val immed8 = Immed8Operand(readByte)
         val regOrMem8 = indirect.getRegOrMem8
         indirect.getRegIndex match {
-          case 0 => ADD(regOrMem8, immed8)
-          case 1 => OR(regOrMem8, immed8)
-          case 2 => ADC(regOrMem8, immed8)
-          case 3 => SBB(regOrMem8, immed8)
-          case 4 => AND(regOrMem8, immed8)
-          case 5 => SUB(regOrMem8, immed8)
-          case 6 => XOR(regOrMem8, immed8)
-          case 7 => CMP(regOrMem8, immed8)
+          case M86Byte(0) => ADD(regOrMem8, immed8)
+          case M86Byte(1) => OR(regOrMem8, immed8)
+          case M86Byte(2) => ADC(regOrMem8, immed8)
+          case M86Byte(3) => SBB(regOrMem8, immed8)
+          case M86Byte(4) => AND(regOrMem8, immed8)
+          case M86Byte(5) => SUB(regOrMem8, immed8)
+          case M86Byte(6) => XOR(regOrMem8, immed8)
+          case M86Byte(7) => CMP(regOrMem8, immed8)
         }
       case M86Byte(0x81) => indirect.reset()
         val immed16 = Immed16Operand(readWord)
         val regOrMem16 = indirect.getRegOrMem16
         indirect.getRegIndex match {
-          case 0 => ADD(regOrMem16, immed16)
-          case 1 => OR(regOrMem16, immed16)
-          case 2 => ADC(regOrMem16, immed16)
-          case 3 => SBB(regOrMem16, immed16)
-          case 4 => AND(regOrMem16, immed16)
-          case 5 => SUB(regOrMem16, immed16)
-          case 6 => XOR(regOrMem16, immed16)
-          case 7 => CMP(regOrMem16, immed16)
+          case M86Byte(0) => ADD(regOrMem16, immed16)
+          case M86Byte(1) => OR(regOrMem16, immed16)
+          case M86Byte(2) => ADC(regOrMem16, immed16)
+          case M86Byte(3) => SBB(regOrMem16, immed16)
+          case M86Byte(4) => AND(regOrMem16, immed16)
+          case M86Byte(5) => SUB(regOrMem16, immed16)
+          case M86Byte(6) => XOR(regOrMem16, immed16)
+          case M86Byte(7) => CMP(regOrMem16, immed16)
         }
 
       case M86Byte(0x82) => indirect.reset()
         val immed8 = Immed8Operand(readByte)
         val regOrMem8 = indirect.getRegOrMem8
         indirect.getRegIndex match {
-          case 0 => ADD(regOrMem8, immed8)
-          case 1 => NotUsed
-          case 2 => ADC(regOrMem8, immed8)
-          case 3 => SBB(regOrMem8, immed8)
-          case 4 => NotUsed
-          case 5 => SUB(regOrMem8, immed8)
-          case 6 => NotUsed
-          case 7 => CMP(regOrMem8, immed8)
+          case M86Byte(0) => ADD(regOrMem8, immed8)
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => ADC(regOrMem8, immed8)
+          case M86Byte(3) => SBB(regOrMem8, immed8)
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => SUB(regOrMem8, immed8)
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => CMP(regOrMem8, immed8)
         }
 
       case M86Byte(0x83) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => ADD(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 1 => NotUsed
-          case 2 => ADC(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 3 => SBB(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 4 => NotUsed
-          case 5 => SUB(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 6 => NotUsed
-          case 7 => CMP(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(0) => ADD(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => ADC(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(3) => SBB(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => SUB(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => CMP(indirect.getRegOrMem16, Immed8Operand(readByte))
         }
       case M86Byte(0x84) => indirect.reset(); TEST(indirect.getRegOrMem8, indirect.getReg8)
       case M86Byte(0x85) => indirect.reset(); TEST(indirect.getRegOrMem16, indirect.getReg16)
@@ -242,18 +242,22 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
 
       case M86Byte(0x8E) => indirect.reset()
         indirect.reset()
-        if (indirect.getRegIndex > 7) NotUsed
-        else MOV(indirect.getSeg, indirect.getRegOrMem16)
+        if (indirect.getRegIndex > 7) {
+          NotUsed
+        }
+        else {
+          MOV(indirect.getSeg, indirect.getRegOrMem16)
+        }
       case M86Byte(0x8F) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => POP(indirect.getRegOrMem16)
-          case 1 => NotUsed
-          case 2 => NotUsed
-          case 3 => NotUsed
-          case 4 => NotUsed
-          case 5 => NotUsed
-          case 6 => NotUsed
-          case 7 => NotUsed
+          case M86Byte(0) => POP(indirect.getRegOrMem16)
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => NotUsed
+          case M86Byte(3) => NotUsed
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => NotUsed
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => NotUsed
         }
 
       case M86Byte(0x90) => XCHG(Reg16Operand(AX), Reg16Operand(AX)) /* aka NOP - No Operation */
@@ -309,24 +313,24 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
 
       case M86Byte(0xC0) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => ROL(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 1 => ROR(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 2 => RCL(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 3 => RCR(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 4 => SHL_SAL(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 5 => SHR(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 6 => NotUsed
-          //case 7 => SAR(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(0) => ROL(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(1) => ROR(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(2) => RCL(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(3) => RCR(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(4) => SHL_SAL(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(5) => SHR(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(6) => NotUsed
+          //case M86Byte(7) => SAR(indirect.getRegOrMem8, Immed8Operand(readByte))
         }
       case M86Byte(0xC1) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => ROL(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 1 => ROR(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 2 => RCL(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 3 => RCR(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 4 => SHL_SAL(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 5 => SHR(indirect.getRegOrMem16, Immed8Operand(readByte))
-          case 6 => NotUsed
+          case M86Byte(0) => ROL(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(1) => ROR(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(2) => RCL(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(3) => RCR(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(4) => SHL_SAL(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(5) => SHR(indirect.getRegOrMem16, Immed8Operand(readByte))
+          case M86Byte(6) => NotUsed
           //case 7) => SAR(indirect.getRegOrMem16, Immed8Operand(readByte))
         }
       case M86Byte(0xC2) => RETN(Immed16Operand(readWord))
@@ -336,24 +340,24 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
       case M86Byte(0xC6) => indirect.reset()
         indirect.getRegIndex match {
           //case 0) => MOV(indirect.getMem8, Immed8Operand(readByte))
-          case 1 => NotUsed
-          case 2 => NotUsed
-          case 3 => NotUsed
-          case 4 => NotUsed
-          case 5 => NotUsed
-          case 6 => NotUsed
-          case 7 => NotUsed
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => NotUsed
+          case M86Byte(3) => NotUsed
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => NotUsed
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => NotUsed
         }
       case M86Byte(0xC7) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => if (indirect.isMemDefined) MOV(indirect.getMem16, Immed16Operand(readWord)) else InvalidOpcode
-          case 1 => NotUsed
-          case 2 => NotUsed
-          case 3 => NotUsed
-          case 4 => NotUsed
-          case 5 => NotUsed
-          case 6 => NotUsed
-          case 7 => NotUsed
+          case M86Byte(0) => if (indirect.isMemDefined) MOV(indirect.getMem16, Immed16Operand(readWord)) else InvalidOpcode
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => NotUsed
+          case M86Byte(3) => NotUsed
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => NotUsed
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => NotUsed
         }
       case M86Byte(0xC8) => ENTER()
       case M86Byte(0xC9) => LEAVE()
@@ -366,47 +370,47 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
 
       case M86Byte(0xD0) => indirect.reset()
         indirect.getRegIndex match {
-          //case 0 => ROL(indirect.getRegOrMem8, 1)
-          //case 1 => ROR(indirect.getRegOrMem8, 1)
-          //case 2 => RCL(indirect.getRegOrMem8, 1)
-          //case 3 => RCR(indirect.getRegOrMem8, 1)
-          //case 4 => SHL_SAL(indirect.getRegOrMem8, 1)
-          //case 5 => SHR(indirect.getRegOrMem8, 1)
-          case 6 => NotUsed
-          //case 7 => SAR(indirect.getRegOrMem8, 1)
+          //case M86Byte(0) => ROL(indirect.getRegOrMem8, 1)
+          //case M86Byte(1) => ROR(indirect.getRegOrMem8, 1)
+          //case M86Byte(2) => RCL(indirect.getRegOrMem8, 1)
+          //case M86Byte(3) => RCR(indirect.getRegOrMem8, 1)
+          //case M86Byte(4) => SHL_SAL(indirect.getRegOrMem8, 1)
+          //case M86Byte(5) => SHR(indirect.getRegOrMem8, 1)
+          case M86Byte(6) => NotUsed
+          //case M86Byte(7) => SAR(indirect.getRegOrMem8, 1)
         }
       case M86Byte(0xD1) => indirect.reset()
         indirect.getRegIndex match {
-          //case 0 => ROL(indirect.getRegOrMem16, 1)
-          //case 1 => ROR(indirect.getRegOrMem16, 1)
-          //case 2 => RCL(indirect.getRegOrMem16, 1)
-          //case 3 => RCR(indirect.getRegOrMem16, 1)
-          //case 4 => SHL_SAL(indirect.getRegOrMem16, 1)
-          //case 5 => SHR(indirect.getRegOrMem16, 1)
-          case 6 => NotUsed
-          //case 7 => SAR(indirect.getRegOrMem16, 1)
+          //case M86Byte(0) => ROL(indirect.getRegOrMem16, 1)
+          //case M86Byte(1) => ROR(indirect.getRegOrMem16, 1)
+          //case M86Byte(2) => RCL(indirect.getRegOrMem16, 1)
+          //case M86Byte(3) => RCR(indirect.getRegOrMem16, 1)
+          //case M86Byte(4) => SHL_SAL(indirect.getRegOrMem16, 1)
+          //case M86Byte(5) => SHR(indirect.getRegOrMem16, 1)
+          case M86Byte(6) => NotUsed
+          //case M86Byte(7) => SAR(indirect.getRegOrMem16, 1)
         }
       case M86Byte(0xD2) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => ROL(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 1 => ROR(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 2 => RCL(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 3 => RCR(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 4 => SHL_SAL(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 5 => SHR(indirect.getRegOrMem8, Reg8Operand(CL))
-          case 6 => NotUsed
-          //case 7 => SAR(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(0) => ROL(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(1) => ROR(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(2) => RCL(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(3) => RCR(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(4) => SHL_SAL(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(5) => SHR(indirect.getRegOrMem8, Reg8Operand(CL))
+          case M86Byte(6) => NotUsed
+          //case M86Byte(7) => SAR(indirect.getRegOrMem8, Reg8Operand(CL))
         }
       case M86Byte(0xD3) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => ROL(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 1 => ROR(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 2 => RCL(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 3 => RCR(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 4 => SHL_SAL(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 5 => SHR(indirect.getRegOrMem16, Reg8Operand(CL))
-          case 6 => NotUsed
-          //case 7 => SAR(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(0) => ROL(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(1) => ROR(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(2) => RCL(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(3) => RCR(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(4) => SHL_SAL(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(5) => SHR(indirect.getRegOrMem16, Reg8Operand(CL))
+          case M86Byte(6) => NotUsed
+          //case M86Byte(7) => SAR(indirect.getRegOrMem16, Reg8Operand(CL))
         }
       case M86Byte(0xD4) => AAM()
       case M86Byte(0xD5) => AAD()
@@ -446,25 +450,25 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
       case M86Byte(0xF5) => CMC()
       case M86Byte(0xF6) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => TEST(indirect.getRegOrMem8, Immed8Operand(readByte))
-          case 1 => NotUsed
-          case 2 => NOT(indirect.getRegOrMem8)
-          case 3 => NEG(indirect.getRegOrMem8)
-          case 4 => MUL(indirect.getRegOrMem8)
-          case 5 => IMUL(indirect.getRegOrMem8)
-          case 6 => DIV(indirect.getRegOrMem8)
-          case 7 => IDIV(indirect.getRegOrMem8)
+          case M86Byte(0) => TEST(indirect.getRegOrMem8, Immed8Operand(readByte))
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => NOT(indirect.getRegOrMem8)
+          case M86Byte(3) => NEG(indirect.getRegOrMem8)
+          case M86Byte(4) => MUL(indirect.getRegOrMem8)
+          case M86Byte(5) => IMUL(indirect.getRegOrMem8)
+          case M86Byte(6) => DIV(indirect.getRegOrMem8)
+          case M86Byte(7) => IDIV(indirect.getRegOrMem8)
         }
       case M86Byte(0xF7) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => TEST(indirect.getRegOrMem16, Immed16Operand(readWord))
-          case 1 => NotUsed
-          case 2 => NOT(indirect.getRegOrMem16)
-          case 3 => NEG(indirect.getRegOrMem16)
-          case 4 => MUL(indirect.getRegOrMem16)
-          case 5 => IMUL(indirect.getRegOrMem16)
-          case 6 => DIV(indirect.getRegOrMem16)
-          case 7 => IDIV(indirect.getRegOrMem16)
+          case M86Byte(0) => TEST(indirect.getRegOrMem16, Immed16Operand(readWord))
+          case M86Byte(1) => NotUsed
+          case M86Byte(2) => NOT(indirect.getRegOrMem16)
+          case M86Byte(3) => NEG(indirect.getRegOrMem16)
+          case M86Byte(4) => MUL(indirect.getRegOrMem16)
+          case M86Byte(5) => IMUL(indirect.getRegOrMem16)
+          case M86Byte(6) => DIV(indirect.getRegOrMem16)
+          case M86Byte(7) => IDIV(indirect.getRegOrMem16)
         }
       case M86Byte(0xF8) => CLC()
       case M86Byte(0xF9) => STC()
@@ -474,25 +478,25 @@ class MachineInstructionDecoder(val cpu: Cpu, val opcodeFetcher: OpcodeFetcher) 
       case M86Byte(0xFD) => STD()
       case M86Byte(0xFE) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => INC(indirect.getRegOrMem8)
-          case 1 => DEC(indirect.getRegOrMem8)
-          case 2 => NotUsed
-          case 3 => NotUsed
-          case 4 => NotUsed
-          case 5 => NotUsed
-          case 6 => NotUsed
-          case 7 => NotUsed
+          case M86Byte(0) => INC(indirect.getRegOrMem8)
+          case M86Byte(1) => DEC(indirect.getRegOrMem8)
+          case M86Byte(2) => NotUsed
+          case M86Byte(3) => NotUsed
+          case M86Byte(4) => NotUsed
+          case M86Byte(5) => NotUsed
+          case M86Byte(6) => NotUsed
+          case M86Byte(7) => NotUsed
         }
       case M86Byte(0xFF) => indirect.reset()
         indirect.getRegIndex match {
-          case 0 => if (indirect.isMemDefined) INC(indirect.getMem16) else InvalidOpcode
-          case 1 => if (indirect.isMemDefined) DEC(indirect.getMem16) else InvalidOpcode
-          case 2 => CALLN(NearProcOperand(indirect.getRegOrMem16))
-          case 3 => if (indirect.isMemDefined) CALLF(FarProcOperand(indirect.getMem16, indirect.getMem16Next)) else InvalidOpcode
-          case 4 => JMP(NearLabelOperand(indirect.getRegOrMem16))
-          //case 5 => if (indirect.isMemDefined) JMP(FarLabelOperand(indirect.getMem16)) else InvalidOpcode
-          case 6 => if (indirect.isMemDefined) PUSH(indirect.getMem16) else InvalidOpcode
-          case 7 => NotUsed
+          case M86Byte(0) => if (indirect.isMemDefined) INC(indirect.getMem16) else InvalidOpcode
+          case M86Byte(1) => if (indirect.isMemDefined) DEC(indirect.getMem16) else InvalidOpcode
+          case M86Byte(2) => CALLN(NearProcOperand(indirect.getRegOrMem16))
+          case M86Byte(3) => if (indirect.isMemDefined) CALLF(FarProcOperand(indirect.getMem16, indirect.getMem16Next)) else InvalidOpcode
+          case M86Byte(4) => JMP(NearLabelOperand(indirect.getRegOrMem16))
+          //case M86Byte(5) => if (indirect.isMemDefined) JMP(FarLabelOperand(indirect.getMem16)) else InvalidOpcode
+          case M86Byte(6) => if (indirect.isMemDefined) PUSH(indirect.getMem16) else InvalidOpcode
+          case M86Byte(7) => NotUsed
         }
 
     }

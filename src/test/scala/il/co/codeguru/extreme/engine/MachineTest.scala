@@ -17,6 +17,7 @@ package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode._
 import il.co.codeguru.extreme.engine.Register._
+import il.co.codeguru.extreme.engine.datatypes.{M86Byte, M86Word}
 import org.scalatest.FunSuite
 
 /**
@@ -34,10 +35,10 @@ class MachineTest extends FunSuite {
 
     val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
 
-    assert(cpu.state.ip == 0x00000000)
+    assert(cpu.state.ip == M86Word(0x00000000))
     val opcode = machine.fetchNextOpcode()
 
-    assert(cpu.state.ip == 0x00000002)
+    assert(cpu.state.ip == M86Word(0x00000002))
   }
 
   test("Bomber: simplest survivor") {
@@ -51,25 +52,25 @@ class MachineTest extends FunSuite {
 
     val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
 
-    assert(cpu.state.ip == 0x00000000)
+    assert(cpu.state.ip == M86Word(0x00000000))
     val opcode1 = machine.fetchNextOpcode()
     val value1: Short = 0xCC
-    assert(opcode1 == MOV(Reg8Operand(AL), Immed8Operand(byte8Bits(value1))))
+    assert(opcode1 == MOV(Reg8Operand(AL), Immed8Operand(M86Byte(value1))))
 
-    assert(cpu.state.ip == 0x00000002)
+    assert(cpu.state.ip == M86Word(0x00000002))
     val opcode2 = machine.fetchNextOpcode()
     val value2: Short = 0x00
-    assert(opcode2 == MOV(Reg16Operand(BX), Immed16Operand(word16Bits(value2))))
+    assert(opcode2 == MOV(Reg16Operand(BX), Immed16Operand(M86Word(value2))))
 
-    assert(cpu.state.ip == 0x00000005)
+    assert(cpu.state.ip == M86Word(0x00000005))
     val opcode3 = machine.fetchNextOpcode()
     // FixMe: assert(opcode3 == MOV(NearLabelOperand(Reg16Operand(BX)), Reg8Operand(AL)))
 
-    assert(cpu.state.ip == 0x00000007)
+    assert(cpu.state.ip == M86Word(0x00000007))
     val opcode4 = machine.fetchNextOpcode()
     assert(opcode4 == INC(Reg16Operand(BX)))
 
-    assert(cpu.state.ip == 0x00000008)
+    assert(cpu.state.ip == M86Word(0x00000008))
     val opcode5 = machine.fetchNextOpcode()
     val value5: Short = 0x5
     // FixMe: assert(opcode5 == JMP(ShortLabelOperand(byte8Bits(value5))))
@@ -81,19 +82,19 @@ class MachineTest extends FunSuite {
 
     // initial state
     val state0 = cpu.state
-    assert(state0.ip == 0)
-    assert(state0.ax == 0)
-    assert(state0.bx == 0)
+    assert(state0.ip == M86Word(0))
+    assert(state0.ax == M86Word(0))
+    assert(state0.bx == M86Word(0))
 
     // mov ax,42
     val opcode1 = machine.fetchNextOpcode()
-    assert(opcode1 == MOV(Reg16Operand(AX), Immed16Operand(42)))
+    assert(opcode1 == MOV(Reg16Operand(AX), Immed16Operand(M86Word(42))))
     val time1 = machine.runOpcode(opcode1)
     assert(time1 == 8)
     val state1 = cpu.state
-    assert(state1.ip == 3)
-    assert(state1.ax == 42)
-    assert(state1.bx == 0)
+    assert(state1.ip == M86Word(3))
+    assert(state1.ax == M86Word(42))
+    assert(state1.bx == M86Word(0))
 
     // mov bx,ax
     val opcode2 = machine.fetchNextOpcode()
@@ -101,9 +102,9 @@ class MachineTest extends FunSuite {
     val time2 = machine.runOpcode(opcode2)
     assert(time2 == 8)
     val state2 = cpu.state
-    assert(state2.ip == 5)
-    assert(state2.ax == 42)
-    assert(state2.bx == 42)
+    assert(state2.ip == M86Word(5))
+    assert(state2.ax == M86Word(42))
+    assert(state2.bx == M86Word(42))
   }
 
   private def getMachineWithProgram(program: Vector[Int]) = {
@@ -111,7 +112,7 @@ class MachineTest extends FunSuite {
     val machine = new Machine()
     val initialCpuState = new CpuState()
     val cpu = new Cpu(initialCpuState, machine)
-    val memoryInit: Vector[Byte] = program.map(_.toByte)
+    val memoryInit: Vector[M86Byte] = program.map(M86Byte(_))
     machine.boot(memoryInit, listener)
     machine.setActiveCpu(cpu)
     (machine, cpu)

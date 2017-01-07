@@ -88,11 +88,11 @@ case class CpuState(ax: M86Word, bx: M86Word, cx: M86Word, dx: M86Word, ds: M86W
 
   def interruptFlag: Boolean = isFlagSet(CpuState.FLAGS_MASK_INTERRUPT)
 
-  private def isFlagSet(flagMask: Int): Boolean = (flags & flagMask) == flagMask
-
   def directionFlag: Boolean = isFlagSet(CpuState.FLAGS_MASK_DIRECTION)
 
   def overflowFlag: Boolean = isFlagSet(CpuState.FLAGS_MASK_OVERFLOW)
+
+  private def isFlagSet(flagMask: M86Word): Boolean = (flags & flagMask) == flagMask
 
   def csip: RealModeAddress = new RealModeAddress(this.cs, this.ip)
 
@@ -127,7 +127,7 @@ case class CpuState(ax: M86Word, bx: M86Word, cx: M86Word, dx: M86Word, ds: M86W
     case Flags => copy(flags = newValue)
   }
 
-  private def setFlag(flagMask: Int, newValue: Boolean): M86Word =
+  private def setFlag(flagMask: M86Word, newValue: Boolean): M86Word =
     if (newValue) flags | flagMask else flags & (~flagMask)
 
   def setRegister8(register: ByteRegister, newValue: M86Byte): CpuState = register match {
@@ -159,13 +159,13 @@ case class CpuState(ax: M86Word, bx: M86Word, cx: M86Word, dx: M86Word, ds: M86W
 }
 
 object CpuState {
-  private val FLAGS_MASK_CARRY: Int = 0x0001
-  private val FLAGS_MASK_PARITY: Int = 0x0004
-  private val FLAGS_MASK_AUX: Int = 0x0010
-  private val FLAGS_MASK_ZERO: Int = 0x0040
-  private val FLAGS_MASK_SIGN: Int = 0x0080
-  private val FLAGS_MASK_TRAP: Int = 0x0100
-  private val FLAGS_MASK_INTERRUPT: Int = 0x0200
-  private val FLAGS_MASK_DIRECTION: Int = 0x0400
-  private val FLAGS_MASK_OVERFLOW: Int = 0x0800
+  private val FLAGS_MASK_CARRY = M86Word(0x0001)
+  private val FLAGS_MASK_PARITY = M86Word(0x0004)
+  private val FLAGS_MASK_AUX = M86Word(0x0010)
+  private val FLAGS_MASK_ZERO = M86Word(0x0040)
+  private val FLAGS_MASK_SIGN = M86Word(0x0080)
+  private val FLAGS_MASK_TRAP = M86Word(0x0100)
+  private val FLAGS_MASK_INTERRUPT = M86Word(0x0200)
+  private val FLAGS_MASK_DIRECTION = M86Word(0x0400)
+  private val FLAGS_MASK_OVERFLOW = M86Word(0x0800)
 }

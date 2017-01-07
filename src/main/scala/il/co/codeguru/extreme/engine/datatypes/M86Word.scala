@@ -15,55 +15,89 @@
 // limitations under the License.
 package il.co.codeguru.extreme.engine.datatypes
 
+import scala.math.ScalaNumericAnyConversions
+
 /**
   *
   * @author romi
   * @since 2016-12-27.
   */
 
-case class M86Word(value: Short) extends AnyVal {
+class M86Word(val value: Int) extends AnyVal with ScalaNumericAnyConversions {
   def lowByte: M86Byte = M86Byte(value & 0xFF)
 
   def highByte: M86Byte = M86Byte((value >> 8) & 0xFF)
 
-  def +(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt + x)
+  def +(x: M86Byte): M86Word = M86Word(value.toInt + x.value)
 
-  def -(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt - x)
+  def -(x: M86Byte): M86Word = M86Word(value.toInt - x.value)
 
-  def *(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt * x)
+  def *(x: M86Byte): M86Word = M86Word(value.toInt * x.value)
 
-  def /(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt / x)
+  def /(x: M86Byte): M86Word = M86Word(value.toInt / x.value)
 
-  def %(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt % x)
+  def %(x: M86Byte): M86Word = M86Word(value.toInt % x.value)
 
-  def &(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt & x)
+  def &(x: M86Byte): M86Word = M86Word(value.toInt & x.value)
 
-  def |(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt | x)
+  def |(x: M86Byte): M86Word = M86Word(value.toInt | x.value)
 
-  def ^(x: Int)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt ^ x)
+  def ^(x: M86Byte): M86Word = M86Word(value.toInt ^ x.value)
 
-  def +(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt + x.value)
+  def +(x: M86Word): M86Word = M86Word(value.toInt + x.value)
 
-  def -(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt - x.value)
+  def -(x: M86Word): M86Word = M86Word(value.toInt - x.value)
 
-  def *(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt * x.value)
+  def *(x: M86Word): M86Word = M86Word(value.toInt * x.value)
 
-  def /(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt / x.value)
+  def /(x: M86Word): M86Word = M86Word(value.toInt / x.value)
 
-  def %(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt % x.value)
+  def %(x: M86Word): M86Word = M86Word(value.toInt % x.value)
 
-  def &(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt & x.value)
+  def &(x: M86Word): M86Word = M86Word(value.toInt & x.value)
 
-  def |(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt | x.value)
+  def |(x: M86Word): M86Word = M86Word(value.toInt | x.value)
 
-  def ^(x: M86Word)(implicit d: DummyImplicit): M86Word = M86Word(value.toInt ^ x.value)
+  def ^(x: M86Word): M86Word = M86Word(value.toInt ^ x.value)
+
+  def ==(x: M86Word): Boolean = value == x.value
+
+  def >(x: M86Word): Boolean = value > x.value
+
+  def <(x: M86Word): Boolean = value < x.value
+
+  def >=(x: M86Word): Boolean = value >= x.value
+
+  def <=(x: M86Word): Boolean = value <= x.value
+
+  def unary_~(): M86Word = M86Word(~value)
+
+  override def isWhole(): Boolean = true
+
+  override def underlying(): Any = value.underlying()
+
+  override def byteValue(): Byte = value.toByte
+
+  override def shortValue(): Short = value.toShort
+
+  override def intValue(): Int = value.toInt
+
+  override def longValue(): Long = value.toLong
+
+  override def floatValue(): Float = value.toFloat
+
+  override def doubleValue(): Double = value.toDouble
 }
 
 object M86Word {
-  def apply(value: Int): M86Word = new M86Word(value.toShort)
+  def apply(byte: M86Byte): M86Word = M86Word(byte.value.toInt)
 
-  def apply(value: Short): M86Word = new M86Word(value)
+  def apply(highByte: M86Byte, lowByte: M86Byte): M86Word = {
+    val highByteValue: Short = (highByte.value << 8).toShort
+    val lowByteValue: Short = lowByte.value
+    val wordValue: Int = highByteValue + lowByteValue
+    apply(wordValue)
+  }
 
-  def apply(highByte: M86Byte, lowByte: M86Byte): M86Word = new M86Word(highByte << 8 + lowByte)
-
+  def apply(value: Int): M86Word = new M86Word((0xFFFF & value).toInt)
 }

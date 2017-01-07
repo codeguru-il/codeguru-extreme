@@ -20,19 +20,19 @@ import il.co.codeguru.extreme.engine.datatypes._
 
 object RealModeAddress {
   /** Various real-mode memory constants. */
-  val NUM_PARAGRAPHS: Int = 64 * 1024
-  val PARAGRAPH_SIZE: Int = 0x10
+  val NUM_PARAGRAPHS: M86Word = M86Word(64 * 1024)
+  val PARAGRAPH_SIZE: M86Word = M86Word(0x10)
   val PARAGRAPHS_IN_SEGMENT: Int = 0x1000
-  val MEMORY_SIZE: Int = NUM_PARAGRAPHS * PARAGRAPH_SIZE
-  val MEMORY_FILL_BYTE: Byte = 0xCC.toByte
+  val MEMORY_SIZE: M86Word = NUM_PARAGRAPHS * PARAGRAPH_SIZE
+  val MEMORY_FILL_BYTE: M86Byte = M86Byte(0xCC)
 }
 
 case class RealModeAddress(segment: M86Word, offset: M86Word) {
   val linearAddress: M86Word = segment * RealModeAddress.PARAGRAPH_SIZE + offset
 
-  def addOffset(offsetDelta: Int): RealModeAddress = new RealModeAddress(this.segment, this.offset + offsetDelta)
+  def addOffset(offsetDelta: M86Word): RealModeAddress = new RealModeAddress(this.segment, this.offset + offsetDelta)
 
-  override def toString: String = f"[$segment%#04x:$offset%#04x]"
+  override def toString: String = f"[${segment.value}%#04x:${offset.value}%#04x]"
 }
 
 trait RealModeMemory {
@@ -51,14 +51,14 @@ abstract class AbstractRealModeMemory extends RealModeMemory {
     val low = readByte(address, execute)
 
     // read high byte
-    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + 1)
+    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + M86Word(1))
     val high = readByte(nextAddress, execute)
 
     M86Word(high, low)
   }
 
   def writeWord(address: RealModeAddress, value: M86Word): RealModeMemory = {
-    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + 1)
+    val nextAddress: RealModeAddress = RealModeAddress(address.segment, address.offset + M86Word(1))
     writeByte(address, value.lowByte).writeByte(nextAddress, value.highByte)
   }
 }
@@ -78,10 +78,10 @@ object NullMemoryAccessListener extends MemoryAccessListener {
 case class RealModeMemoryImpl(memoryBytes: Vector[M86Byte], listener: MemoryAccessListener) extends AbstractRealModeMemory {
   // init memory
   def this(listener: MemoryAccessListener) =
-    this(Vector.fill(RealModeAddress.MEMORY_SIZE)(RealModeAddress.MEMORY_FILL_BYTE), listener)
+    this(Vector.fill(RealModeAddress.MEMORY_SIZE.toInt)(RealModeAddress.MEMORY_FILL_BYTE), listener)
 
   def readByte(address: RealModeAddress, execute: Boolean): M86Byte = {
-    val value: M86Byte = memoryBytes(address.linearAddress)
+    val value: M86Byte = memoryBytes(address.linearAddress.toInt)
 
     listener.readMemory(address, value, execute)
 
@@ -91,7 +91,7 @@ case class RealModeMemoryImpl(memoryBytes: Vector[M86Byte], listener: MemoryAcce
   def writeByte(address: RealModeAddress, value: M86Byte): RealModeMemory = {
     listener.writeMemory(address, value)
 
-    RealModeMemoryImpl(memoryBytes.updated(address.linearAddress, value), this.listener)
+    RealModeMemoryImpl(memoryBytes.updated(address.linearAddress.toInt, value), this.listener)
   }
 }
 
@@ -116,12 +116,12 @@ class RestrictedAccessRealModeMemory(memory: RealModeMemory,
     memory.readByte(address, execute)
   }
 
+  private def isAddressInRegions(regions: Array[RealModeMemoryRegion], address: RealModeAddress) =
+    regions.indexWhere(_.isInRegion(address)) >= 0
+
   def writeByte(address: RealModeAddress, value: M86Byte): RealModeMemory = {
     // is writing allowed to this address ?
     if (!isAddressInRegions(writeAccessRegions, address)) throw new MemoryException
     memory.writeByte(address, value)
   }
-
-  private def isAddressInRegions(regions: Array[RealModeMemoryRegion], address: RealModeAddress) =
-    regions.indexWhere(_.isInRegion(address)) >= 0
 }

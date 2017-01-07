@@ -16,6 +16,7 @@
 package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode.OperationCode
+import il.co.codeguru.extreme.engine.datatypes.M86Byte
 
 /**
   *
@@ -27,7 +28,7 @@ class Machine() {
   var activeCpu: Cpu = _
   var memory: RealModeMemory = _
 
-  def boot(memoryBytes: Vector[Byte], listener: MemoryAccessListener): Unit = {
+  def boot(memoryBytes: Vector[M86Byte], listener: MemoryAccessListener): Unit = {
     memory = RealModeMemoryImpl(memoryBytes, listener)
   }
 
