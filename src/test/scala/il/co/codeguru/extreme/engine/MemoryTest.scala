@@ -16,15 +16,16 @@
 
 package il.co.codeguru.extreme.engine
 
+import il.co.codeguru.extreme.engine.datatypes.M86Word
 import org.scalatest.FunSuite
 
 class RealModeAddressTest extends FunSuite {
 
   // Create memory locations for the tests to use.
-  val memoryLocations: Seq[(Word16Bits, Word16Bits)] =
+  val memoryLocations: Seq[(M86Word, M86Word)] =
     for (segment <- 0x0 to 0x10;
          offset <- 0x0 to RealModeAddress.PARAGRAPHS_IN_SEGMENT)
-      yield (segment, offset)
+      yield (M86Word(segment), M86Word(offset))
 
   test("Segment and offset are saved in the address object") {
     for ((segment, offset) <- memoryLocations) {
@@ -37,7 +38,7 @@ class RealModeAddressTest extends FunSuite {
 
   test("Linear address from segment and offset is calculated well") {
     for ((segment, offset) <- memoryLocations) {
-      val linearAddress = segment * 0x10 + offset
+      val linearAddress: M86Word = segment * M86Word(0x10) + offset
       val addr = RealModeAddress(segment, offset)
 
       assert(addr.linearAddress == linearAddress)
@@ -46,10 +47,10 @@ class RealModeAddressTest extends FunSuite {
 
   test("Same linear address is calculated from different segment and offsets") {
     for ((segment, offset) <- memoryLocations) {
-      val segment1 = segment + 0x1
+      val segment1 = segment + M86Word(0x1)
       val offset1 = offset
-      val segment2 = segment1 - 0x1
-      val offset2 = offset1 + 0x10
+      val segment2 = segment1 - M86Word(0x1)
+      val offset2 = offset1 + M86Word(0x10)
 
       val addr1 = RealModeAddress(segment1, offset1)
       val addr2 = RealModeAddress(segment2, offset2)
@@ -59,8 +60,8 @@ class RealModeAddressTest extends FunSuite {
 
   test("Offset is cyclic") {
     for ((segment, offset) <- memoryLocations) {
-      val addr1 = RealModeAddress(segment, offset + 0xffff)
-      val addr2 = RealModeAddress(segment, offset - 0x1)
+      val addr1 = RealModeAddress(segment, offset + M86Word(0xffff))
+      val addr2 = RealModeAddress(segment, offset - M86Word(0x1))
 
       assert(addr1.segment == addr2.segment)
       assert(addr1.offset == addr2.offset)
@@ -69,8 +70,8 @@ class RealModeAddressTest extends FunSuite {
 
   test("Segment is cyclic") {
     for ((segment, offset) <- memoryLocations) {
-      val addr1 = RealModeAddress(segment + 0xffff, offset)
-      val addr2 = RealModeAddress(segment - 0x1, offset)
+      val addr1 = RealModeAddress(segment + M86Word(0xffff), offset)
+      val addr2 = RealModeAddress(segment - M86Word(0x1), offset)
 
       assert(addr1.segment == addr2.segment)
       assert(addr1.offset == addr2.offset)

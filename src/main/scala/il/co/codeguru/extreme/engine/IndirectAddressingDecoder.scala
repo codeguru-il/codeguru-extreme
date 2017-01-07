@@ -17,6 +17,7 @@ package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode._
 import il.co.codeguru.extreme.engine.Register._
+import il.co.codeguru.extreme.engine.datatypes.{M86Byte, M86Word}
 
 /**
   * Decoder for MOD + REG + REG/MEM encoding in Cpu instructions
@@ -29,8 +30,8 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
 
   private val m_state = cpu.state
   private val m_fetcher: OpcodeFetcher = cpu.opcodeFetcher
-  private var regIndex: Byte = 0
-  private var regOrMemIndex: Byte = 0
+  private var regIndex: M86Byte = M86Byte(0)
+  private var regOrMemIndex: M86Byte = M86Byte(0)
   private var memAddress: Option[RealModeAddress] = None
   private var regOperand: Operand = _
   private var regOrMemOperand: Operand = _
@@ -42,9 +43,9 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
   def reset(): Unit = {
     val modeByte = m_fetcher.nextByte
 
-    val mode: Byte = ((modeByte >> 6) & 0x03).toByte
-    regIndex = ((modeByte >> 3) & 0x07).toByte
-    regOrMemIndex = (modeByte & 0x07).toByte
+    val mode: M86Byte = (modeByte >> 6) & 0x03
+    regIndex = (modeByte >> 3) & 0x07
+    regOrMemIndex = modeByte & 0x07
 
     if (mode == 3) {
       memAddress = None
@@ -54,43 +55,41 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
     }
   }
 
-  private def getModeAddress(mode: Byte): RealModeAddress = {
-    val displacement: Int = mode match {
-      case 0 => 0
-      case 1 => m_fetcher.nextByte.toInt
-      case 2 => m_fetcher.nextWord
+  private def getModeAddress(mode: M86Byte): RealModeAddress = {
+    val displacement: M86Word = mode match {
+      case M86Byte(0) => M86Word(0)
+      case M86Byte(1) => M86Word(m_fetcher.nextByte)
+      case M86Byte(2) => m_fetcher.nextWord
     }
 
     regOrMemIndex match {
-      case 0 => newAddress(DS, m_state.bx + m_state.si + displacement)
-      case 1 => newAddress(DS, m_state.bx + m_state.di + displacement)
-      case 2 => newAddress(SS, m_state.bp + m_state.si + displacement)
-      case 3 => newAddress(SS, m_state.bp + m_state.di + displacement)
-      case 4 => newAddress(DS, m_state.si + displacement)
-      case 5 => newAddress(DS, m_state.di + displacement)
-      case 6 => if (mode == 0) {
+      case M86Byte(0) => newAddress(DS, m_state.bx + m_state.si + displacement)
+      case M86Byte(1) => newAddress(DS, m_state.bx + m_state.di + displacement)
+      case M86Byte(2) => newAddress(SS, m_state.bp + m_state.si + displacement)
+      case M86Byte(3) => newAddress(SS, m_state.bp + m_state.di + displacement)
+      case M86Byte(4) => newAddress(DS, m_state.si + displacement)
+      case M86Byte(5) => newAddress(DS, m_state.di + displacement)
+      case M86Byte(6) => if (mode == 0) {
         newAddress(DS, m_fetcher.nextWord)
       }
       else {
         newAddress(SS, m_state.bp + displacement)
       }
-      case 7 => newAddress(DS, m_state.bx + displacement)
+      case M86Byte(7) => newAddress(DS, m_state.bx + displacement)
     }
   }
 
-  def newAddress(segIndex: SegmentRegister, offset: Int): RealModeAddress = {
-    val segmentRegister = if (forcedSegReg.isDefined) forcedSegReg.get else segIndex
-    val segment: Int = m_state.getRegister(segmentRegister)
+  def newAddress(segIndex: SegmentRegister, offset: M86Word): RealModeAddress = {
+    val segmentRegister = forcedSegReg.getOrElse(segIndex)
+    val segment: M86Word = m_state.getRegister16(segmentRegister)
     new RealModeAddress(segment, offset)
   }
 
-  def getRegIndex: Byte = regIndex
+  def getRegIndex: M86Byte = regIndex
 
   def getReg8: Reg8Operand = Reg8Operand(Register.getReg8(regIndex))
 
   def getMem8: Option[Mem8Operand] = if (isMemDefined) Some(Mem8Operand(memAddress.get)) else None
-
-  def isMemDefined: Boolean = memAddress.isDefined
 
   def getRegOrMem8: RegisterOrMemoryOperand = {
     if (isMemDefined) {
@@ -107,7 +106,9 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
 
   def getMem16: Mem16Operand = if (isMemDefined) Mem16Operand(memAddress.get) else throw new IllegalArgumentException("Memory Undefined")
 
-  def getMem16Next: Mem16Operand = if (isMemDefined) Mem16Operand(memAddress.get.addOffset(2)) else throw new IllegalArgumentException("Memory Undefined")
+  def isMemDefined: Boolean = memAddress.isDefined
+
+  def getMem16Next: Mem16Operand = if (isMemDefined) Mem16Operand(memAddress.get.addOffset(M86Word(2))) else throw new IllegalArgumentException("Memory Undefined")
 
   def getRegOrMem16: RegisterOrMemoryOperand = {
     if (isMemDefined) {
@@ -130,12 +131,17 @@ class IndirectAddressingDecoder(val cpu: Cpu) {
     repeatWhileEqual = Some(false)
   }
 
-  def newAddress(segIndex: SegmentRegister, baseReg: Register, indexReg: Register): RealModeAddress = {
-    val segment: Int = m_state.getRegister(if (forcedSegReg.isDefined) {
-      forcedSegReg.get
-    } else segIndex)
-    val offsetBase: Int = m_state.getRegister(baseReg)
-    val offsetIndex: Int = m_state.getRegister(indexReg)
+  def newAddress(segIndex: SegmentRegister, baseReg: WordRegister, indexReg: ByteRegister): RealModeAddress = {
+    val segment: M86Word = m_state.getRegister16(forcedSegReg.getOrElse(segIndex))
+    val offsetBase: M86Word = m_state.getRegister16(baseReg)
+    val offsetIndex: M86Byte = m_state.getRegister8(indexReg)
+    new RealModeAddress(segment, offsetBase + offsetIndex)
+  }
+
+  def newAddress(segIndex: SegmentRegister, baseReg: WordRegister, indexReg: WordRegister): RealModeAddress = {
+    val segment: M86Word = m_state.getRegister16(forcedSegReg.getOrElse(segIndex))
+    val offsetBase: M86Word = m_state.getRegister16(baseReg)
+    val offsetIndex: M86Word = m_state.getRegister16(indexReg)
     new RealModeAddress(segment, offsetBase + offsetIndex)
   }
 }

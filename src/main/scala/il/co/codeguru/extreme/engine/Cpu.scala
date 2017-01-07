@@ -17,6 +17,7 @@ package il.co.codeguru.extreme.engine
 
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode._
 import il.co.codeguru.extreme.engine.Register._
+import il.co.codeguru.extreme.engine.datatypes.{M86Byte, M86Word}
 
 /**
   *
@@ -115,8 +116,8 @@ class Cpu(var state: CpuState, var machine: Machine) {
       //case (dest: SegRegOperand, src: Mem16Operand) => MOV(dest, src, 8)
       //case (dest: Reg16Operand, src: SegRegOperand) => MOV(dest, src, 2)
       //case (dest: Mem8Operand, src: SegRegOperand) => MOV(dest, src, 9)
-      case (dest: Reg16Operand, src: Immed16Operand) => state = state.setRegister(dest.register, src.value); 8
-      case (dest: Reg16Operand, src: Reg16Operand) => state = state.setRegister(dest.register, state.getRegister(src.register)); 8
+      case (dest: Reg16Operand, src: Immed16Operand) => state = state.setRegister16(dest.register, src.value); 8
+      case (dest: Reg16Operand, src: Reg16Operand) => state = state.setRegister16(dest.register, state.getRegister16(src.register)); 8
     }
 
     case MOVSB(destination, source) => ???
@@ -162,15 +163,15 @@ class Cpu(var state: CpuState, var machine: Machine) {
 }
 
 class OpcodeFetcher(val cpu: Cpu) {
-  def nextByte: Byte8Bits = {
+  def nextByte: M86Byte = {
     val address = cpu.state.csip
-    cpu.state = cpu.state.setRegister(IP, (cpu.state.ip + 1).toShort)
+    cpu.state = cpu.state.setRegister16(IP, cpu.state.ip + M86Word(1))
     cpu.machine.memory.readByte(address, execute = true)
   }
 
-  def nextWord: Word16Bits = {
+  def nextWord: M86Word = {
     val address = cpu.state.csip
-    cpu.state = cpu.state.setRegister(IP, (cpu.state.ip + 2).toShort)
+    cpu.state = cpu.state.setRegister16(IP, cpu.state.ip + M86Word(2))
     cpu.machine.memory.readWord(address, execute = true)
   }
 }

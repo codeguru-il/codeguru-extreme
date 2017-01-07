@@ -16,6 +16,8 @@
 
 package il.co.codeguru.extreme.engine
 
+import il.co.codeguru.extreme.engine.datatypes.M86Byte
+
 /**
   * Cpu state fields - registers and flags
   *
@@ -27,43 +29,43 @@ abstract class StateField
 
 object Register extends StateField {
 
-  def getReg8(index: Byte): ByteRegister = getByteRegisterFromIndex(index)
+  def getReg8(index: M86Byte): ByteRegister = getByteRegisterFromIndex(index)
 
-  private def getByteRegisterFromIndex(index: Byte): ByteRegister = index match {
-    case 0 => AL
-    case 1 => CL
-    case 2 => DL
-    case 3 => BL
-    case 4 => AH
-    case 5 => CH
-    case 6 => DH
-    case 7 => BH
+  private def getByteRegisterFromIndex(index: M86Byte): ByteRegister = index match {
+    case M86Byte(0) => AL
+    case M86Byte(1) => CL
+    case M86Byte(2) => DL
+    case M86Byte(3) => BL
+    case M86Byte(4) => AH
+    case M86Byte(5) => CH
+    case M86Byte(6) => DH
+    case M86Byte(7) => BH
   }
 
-  def getReg16(index: Byte): WordRegister = getWordRegisterFromIndex(index)
+  def getReg16(index: M86Byte): WordRegister = getWordRegisterFromIndex(index)
 
-  private def getWordRegisterFromIndex(index: Byte): WordRegister = index match {
-    case 0 => AX
-    case 1 => CX
-    case 2 => DX
-    case 3 => BX
-    case 4 => SP
-    case 5 => BP
-    case 6 => SI
-    case 7 => DI
+  private def getWordRegisterFromIndex(index: M86Byte): WordRegister = index match {
+    case M86Byte(0) => AX
+    case M86Byte(1) => CX
+    case M86Byte(2) => DX
+    case M86Byte(3) => BX
+    case M86Byte(4) => SP
+    case M86Byte(5) => BP
+    case M86Byte(6) => SI
+    case M86Byte(7) => DI
   }
 
-  def getSeg(index: Byte): SegmentRegister = segmentFromIndex(index)
+  def getSeg(index: M86Byte): SegmentRegister = segmentFromIndex(index)
 
-  private def segmentFromIndex(index: Byte): SegmentRegister = index match {
-    case 0 => ES
-    case 1 => CS
-    case 2 => SS
-    case 3 => DS
-    case 4 => ES
-    case 5 => CS
-    case 6 => SS
-    case 7 => DS
+  private def segmentFromIndex(index: M86Byte): SegmentRegister = index match {
+    case M86Byte(0) => ES
+    case M86Byte(1) => CS
+    case M86Byte(2) => SS
+    case M86Byte(3) => DS
+    case M86Byte(4) => ES
+    case M86Byte(5) => CS
+    case M86Byte(6) => SS
+    case M86Byte(7) => DS
   }
 
   sealed abstract class Register(val description: String, val biteLength: Byte)
@@ -122,7 +124,7 @@ object Register extends StateField {
 
   case object IP extends WordRegister("Instruction Pointer")
 
-  case object Flags extends ByteRegister("Flags")
+  case object Flags extends WordRegister("Flags")
 
 }
 
