@@ -24,51 +24,51 @@ import scala.math.ScalaNumericAnyConversions
   */
 
 class M86Byte(val value: Short) extends AnyVal with ScalaNumericAnyConversions {
-  def >>(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value >> x)
+  def >>(x: Int): M86Byte = M86Byte(value >> x)
 
-  def <<(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value << x)
+  def <<(x: Int): M86Byte = M86Byte(value << x)
 
-  def +(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt + x)
+  def +(x: Int): M86Byte = M86Byte(value.toInt + x)
 
-  def -(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt - x)
+  def -(x: Int): M86Byte = M86Byte(value.toInt - x)
 
-  def *(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt * x)
+  def *(x: Int): M86Byte = M86Byte(value.toInt * x)
 
-  def /(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt / x)
+  def /(x: Int): M86Byte = M86Byte(value.toInt / x)
 
-  def %(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt % x)
+  def %(x: Int): M86Byte = M86Byte(value.toInt % x)
 
-  def &(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt & x)
+  def &(x: Int): M86Byte = M86Byte(value.toInt & x)
 
-  def |(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt | x)
+  def |(x: Int): M86Byte = M86Byte(value.toInt | x)
 
-  def ^(x: Int)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt ^ x)
+  def ^(x: Int): M86Byte = M86Byte(value.toInt ^ x)
 
-  def +(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt + x.value)
+  def +(x: M86Byte): M86Byte = M86Byte(value.toInt + x.value)
 
-  def -(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt - x.value)
+  def -(x: M86Byte): M86Byte = M86Byte(value.toInt - x.value)
 
-  def *(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt * x.value)
+  def *(x: M86Byte): M86Byte = M86Byte(value.toInt * x.value)
 
-  def /(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt / x.value)
+  def /(x: M86Byte): M86Byte = M86Byte(value.toInt / x.value)
 
-  def %(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt % x.value)
+  def %(x: M86Byte): M86Byte = M86Byte(value.toInt % x.value)
 
-  def &(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt & x.value)
+  def &(x: M86Byte): M86Byte = M86Byte(value.toInt & x.value)
 
-  def |(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt | x.value)
+  def |(x: M86Byte): M86Byte = M86Byte(value.toInt | x.value)
 
-  def ^(x: M86Byte)(implicit d: DummyImplicit): M86Byte = M86Byte(value.toInt ^ x.value)
+  def ^(x: M86Byte): M86Byte = M86Byte(value.toInt ^ x.value)
 
-  def ==(x: Int)(implicit d: DummyImplicit): Boolean = value == x
+  def ==(x: Int): Boolean = value == x
 
-  def >(x: Int)(implicit d: DummyImplicit): Boolean = value > x
+  def >(x: Int): Boolean = value > x
 
-  def <(x: Int)(implicit d: DummyImplicit): Boolean = value < x
+  def <(x: Int): Boolean = value < x
 
-  def >=(x: Int)(implicit d: DummyImplicit): Boolean = value >= x
+  def >=(x: Int): Boolean = value >= x
 
-  def <=(x: Int)(implicit d: DummyImplicit): Boolean = value <= x
+  def <=(x: Int): Boolean = value <= x
 
   override def isWhole(): Boolean = true
 
