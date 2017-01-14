@@ -63,13 +63,13 @@ class IndirectAddressingDecoder(val opcodeFetcher: OpcodeFetcher) {
           case M86Byte(3) => MemoryBaseIndexAddressing(BP, DI)
           case M86Byte(4) => MemoryIndexAddressing(SI)
           case M86Byte(5) => MemoryIndexAddressing(DI)
-          case M86Byte(6) => MemoryDirectAddressing(Immed16Operand(opcodeFetcher.nextWord))
+          case M86Byte(6) => MemoryDirectAddressing(Immed16Operand(opcodeFetcher.nextWord()))
           case M86Byte(7) => MemoryBaseAddressing(BX)
         }
       }
 
       case M86Byte(1) => {
-        val displacement = Immed8Operand(opcodeFetcher.nextByte)
+        val displacement = Immed8Operand(opcodeFetcher.nextByte())
 
         regOrMemIndex match {
           case M86Byte(0) => MemoryBaseIndexDisp8Addressing(BX, SI, displacement)
@@ -83,7 +83,7 @@ class IndirectAddressingDecoder(val opcodeFetcher: OpcodeFetcher) {
         }
       }
       case M86Byte(2) => {
-        val displacement = Immed16Operand(opcodeFetcher.nextWord)
+        val displacement = Immed16Operand(opcodeFetcher.nextWord())
 
         regOrMemIndex match {
           case M86Byte(0) => MemoryBaseIndexDisp16Addressing(BX, SI, displacement)
