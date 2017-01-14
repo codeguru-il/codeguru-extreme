@@ -85,6 +85,8 @@ class M86Byte(val value: Short) extends AnyVal with ScalaNumericAnyConversions {
   override def floatValue(): Float = value.toFloat
 
   override def doubleValue(): Double = value.toDouble
+
+  override def toString: String = value.formatted("0x%02x")
 }
 
 object M86Byte {

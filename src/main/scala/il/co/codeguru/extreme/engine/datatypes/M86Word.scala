@@ -87,6 +87,8 @@ class M86Word(val value: Int) extends AnyVal with ScalaNumericAnyConversions {
   override def floatValue(): Float = value.toFloat
 
   override def doubleValue(): Double = value.toDouble
+
+  override def toString: String = value.formatted("0x%04x")
 }
 
 object M86Word {
