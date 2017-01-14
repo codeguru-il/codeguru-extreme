@@ -33,6 +33,7 @@ License:
   - Page 2-30: Section 2.7 Instruction Set
    - Page 2-49: Table 2-17. Key to Instruction Coding Formats
    - Page 2-50: Table 2-19. Key to Operand Types
+   - Page 2-51: Table 2-20. Effective Address Calculation Time
    - Page 2-51: Table 2-21. Instruction Set Reference Data
   - Page 2-68: Section 2.8 Addressing Modes
   - Page 4-1: Section 4.2 8086 and 8088 CPUs
