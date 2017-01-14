@@ -68,59 +68,65 @@ object Register extends StateField {
     case M86Byte(7) => DS
   }
 
-  sealed abstract class Register(val description: String, val biteLength: Byte)
+  sealed trait DataRegister
+
+  sealed trait DataByteRegister extends DataRegister
+
+  sealed trait DataWordRegister extends DataRegister
+
+  sealed trait PointerRegister
+
+  sealed trait AddressBaseRegister
+
+  sealed trait IndexRegister
+
+  sealed trait SegmentRegister
+
+  sealed abstract class Register(val description: String, val bitLength: Byte)
 
   sealed abstract class ByteRegister(description: String) extends Register(description, 8)
 
   sealed abstract class WordRegister(description: String) extends Register(description, 16)
 
-  sealed abstract class DataByteRegister(description: String) extends ByteRegister(description)
+  case object AX extends WordRegister("Accumulator") with DataWordRegister
 
-  sealed abstract class DataWordRegister(description: String) extends WordRegister(description)
+  case object AH extends ByteRegister("Accumulator High") with DataByteRegister
 
-  sealed abstract class PointerAndIndexRegister(description: String) extends WordRegister(description)
+  case object AL extends ByteRegister("Accumulator Low") with DataByteRegister
 
-  sealed abstract class SegmentRegister(description: String) extends WordRegister(description)
+  case object BX extends WordRegister("Base") with DataWordRegister with AddressBaseRegister
 
-  case object AX extends DataWordRegister("Accumulator")
+  case object BH extends ByteRegister("Base High") with DataByteRegister
 
-  case object AH extends DataByteRegister("Accumulator High")
+  case object BL extends ByteRegister("Base Low") with DataByteRegister
 
-  case object AL extends DataByteRegister("Accumulator Low")
+  case object CX extends WordRegister("Count") with DataWordRegister
 
-  case object BX extends DataWordRegister("Base")
+  case object CH extends ByteRegister("Count High") with DataByteRegister
 
-  case object BH extends DataByteRegister("Base High")
+  case object CL extends ByteRegister("Count Low") with DataByteRegister
 
-  case object BL extends DataByteRegister("Base Low")
+  case object DX extends WordRegister("Data") with DataWordRegister
 
-  case object CX extends DataWordRegister("Count")
+  case object DH extends ByteRegister("Data High") with DataByteRegister
 
-  case object CH extends DataByteRegister("Count High")
+  case object DL extends ByteRegister("Data Low") with DataByteRegister
 
-  case object CL extends DataByteRegister("Count Low")
+  case object SP extends WordRegister("Stack Pointer") with PointerRegister
 
-  case object DX extends DataWordRegister("Data")
+  case object BP extends WordRegister("Base Pointer") with PointerRegister with AddressBaseRegister
 
-  case object DH extends DataByteRegister("Data High")
+  case object SI extends WordRegister("Source Index") with IndexRegister with AddressBaseRegister
 
-  case object DL extends DataByteRegister("Data Low")
+  case object DI extends WordRegister("Destination Index") with IndexRegister with AddressBaseRegister
 
-  case object SP extends PointerAndIndexRegister("Stack Pointer")
+  case object CS extends WordRegister("Code Segment") with SegmentRegister
 
-  case object BP extends PointerAndIndexRegister("Base Pointer")
+  case object DS extends WordRegister("Data Segment") with SegmentRegister
 
-  case object SI extends PointerAndIndexRegister("Source Index")
+  case object SS extends WordRegister("Stack Segment") with SegmentRegister
 
-  case object DI extends PointerAndIndexRegister("Destination Index")
-
-  case object CS extends SegmentRegister("Code Segment")
-
-  case object DS extends SegmentRegister("Data Segment")
-
-  case object SS extends SegmentRegister("Stack Segment")
-
-  case object ES extends SegmentRegister("Extra Segment")
+  case object ES extends WordRegister("Extra Segment") with SegmentRegister
 
   case object IP extends WordRegister("Instruction Pointer")
 

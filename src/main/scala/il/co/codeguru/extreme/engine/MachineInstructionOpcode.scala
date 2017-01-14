@@ -42,15 +42,39 @@ object MachineInstructionOpcode {
 
   abstract class LabelOperand extends Operand
 
+  abstract class MemoryAddressing
+
   case class Reg8Operand(register: ByteRegister) extends RegisterOperand
 
   case class Reg16Operand(register: WordRegister) extends RegisterOperand
 
   case class SegRegOperand(register: SegmentRegister) extends Operand
 
-  case class Mem8Operand(address: RealModeAddress) extends MemoryOperand
+  case class MemoryDirectAddressing(offset: Immed16Operand) extends MemoryAddressing
 
-  case class Mem16Operand(address: RealModeAddress) extends MemoryOperand
+  case class MemoryBaseAddressing(baseRegister: AddressBaseRegister) extends MemoryAddressing
+
+  case class MemoryBaseDisp8Addressing(baseRegister: AddressBaseRegister, displacement: Immed8Operand) extends MemoryAddressing
+
+  case class MemoryBaseDisp16Addressing(baseRegister: AddressBaseRegister, displacement: Immed16Operand) extends MemoryAddressing
+
+  case class MemoryIndexAddressing(indexRegister: IndexRegister) extends MemoryAddressing
+
+  case class MemoryIndexDisp8Addressing(indexRegister: IndexRegister, displacement: Immed8Operand) extends MemoryAddressing
+
+  case class MemoryIndexDisp16Addressing(indexRegister: IndexRegister, displacement: Immed16Operand) extends MemoryAddressing
+
+  case class MemoryBaseIndexAddressing(baseRegister: AddressBaseRegister, indexRegister: IndexRegister) extends MemoryAddressing
+
+  case class MemoryBaseIndexDisp8Addressing(baseRegister: AddressBaseRegister, indexRegister: IndexRegister, displacement: Immed8Operand) extends MemoryAddressing
+
+  case class MemoryBaseReg8Addressing(baseRegister: AddressBaseRegister, displacement: ByteRegister) extends MemoryAddressing
+
+  case class MemoryBaseIndexDisp16Addressing(baseRegister: AddressBaseRegister, indexRegister: IndexRegister, displacement: Immed16Operand) extends MemoryAddressing
+
+  case class Mem8Operand(address: MemoryAddressing) extends MemoryOperand
+
+  case class Mem16Operand(address: MemoryAddressing) extends MemoryOperand
 
   case class AccumulatorOperand(register: Register) extends Operand
 
@@ -68,7 +92,7 @@ object MachineInstructionOpcode {
 
   case class FarProcOperand(offset: Operand, segment: Operand) extends LabelOperand
 
-  case class StringOperand(offset: PointerAndIndexRegister)
+  case class StringOperand(offset: IndexRegister)
 
   // ToDo: add remaining
 
@@ -114,7 +138,7 @@ object MachineInstructionOpcode {
     * 33H, then AL will contain 33H following the instruction. XLAT is useful for translating characters from one code
     * to another, the classic example being ASCII to EBCDIC or the reverse.
     */
-  case class XLAT(translateTable: Mem16Operand) extends OperationCode("Translate byte to AL", InstructionType.DataTransfer)
+  case class XLAT(translateTable: MemoryAddressing) extends OperationCode("Translate byte to AL", InstructionType.DataTransfer)
 
   /** IN accumulator,port
     *

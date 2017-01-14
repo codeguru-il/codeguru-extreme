@@ -163,13 +163,13 @@ class Cpu(var state: CpuState, var machine: Machine) {
 }
 
 class OpcodeFetcher(val cpu: Cpu) {
-  def nextByte: M86Byte = {
+  def nextByte(): M86Byte = {
     val address = cpu.state.csip
     cpu.state = cpu.state.setRegister16(IP, cpu.state.ip + M86Word(1))
     cpu.machine.memory.readByte(address, execute = true)
   }
 
-  def nextWord: M86Word = {
+  def nextWord(): M86Word = {
     val address = cpu.state.csip
     cpu.state = cpu.state.setRegister16(IP, cpu.state.ip + M86Word(2))
     cpu.machine.memory.readWord(address, execute = true)

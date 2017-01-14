@@ -37,6 +37,22 @@ class MachineTest extends FunSuite {
 
     assert(cpu.state.ip == M86Word(0x00000000))
     val opcode = machine.fetchNextOpcode()
+    assert(opcode == MOV(Mem8Operand(MemoryBaseAddressing(BX)), Reg8Operand(AL)))
+
+    assert(cpu.state.ip == M86Word(0x00000002))
+  }
+
+  test("jmp short 0x5") {
+    val program = Vector(
+      0xEB, 0xFB // 00000008  EBFB              jmp short 0x5
+    )
+
+    val (machine: Machine, cpu: Cpu) = getMachineWithProgram(program)
+
+    assert(cpu.state.ip == M86Word(0x00000000))
+    val opcode = machine.fetchNextOpcode()
+    //val value = M86Byte(0x5)
+    //FixMe: assert(opcode == JMP(ShortLabelOperand(value)))
 
     assert(cpu.state.ip == M86Word(0x00000002))
   }
@@ -64,7 +80,7 @@ class MachineTest extends FunSuite {
 
     assert(cpu.state.ip == M86Word(0x00000005))
     val opcode3 = machine.fetchNextOpcode()
-    // FixMe: assert(opcode3 == MOV(NearLabelOperand(Reg16Operand(BX)), Reg8Operand(AL)))
+    assert(opcode3 == MOV(Mem8Operand(MemoryBaseAddressing(BX)), Reg8Operand(AL)))
 
     assert(cpu.state.ip == M86Word(0x00000007))
     val opcode4 = machine.fetchNextOpcode()
@@ -72,8 +88,8 @@ class MachineTest extends FunSuite {
 
     assert(cpu.state.ip == M86Word(0x00000008))
     val opcode5 = machine.fetchNextOpcode()
-    val value5: Short = 0x5
-    // FixMe: assert(opcode5 == JMP(ShortLabelOperand(byte8Bits(value5))))
+    //val value5 = M86Byte(0x5)
+    //FixMe: assert(opcode5 == JMP(ShortLabelOperand(value5)))
   }
 
   test("Execute and validate state: mov ax,42; mov bx,ax") {
