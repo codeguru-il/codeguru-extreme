@@ -39,7 +39,7 @@ class IndirectAddressingDecoder(val opcodeFetcher: OpcodeFetcher) {
   // def getMemAddress: Address = m_memAddress
 
   def reset(): Unit = {
-    val modeByte = opcodeFetcher.nextByte
+    val modeByte = opcodeFetcher.nextByte()
 
     val mode: M86Byte = (modeByte >> 6) & 0x03
     regIndex = (modeByte >> 3) & 0x07
