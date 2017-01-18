@@ -15,9 +15,10 @@
 // limitations under the License.
 package il.co.codeguru.extreme.engine
 
+import il.co.codeguru.extreme.engine.Flag._
 import il.co.codeguru.extreme.engine.MachineInstructionOpcode._
 import il.co.codeguru.extreme.engine.Register._
-import il.co.codeguru.extreme.engine.datatypes.{M86Byte, M86Word}
+import il.co.codeguru.extreme.engine.datatypes._
 
 /**
   *
@@ -41,65 +42,81 @@ class Cpu(var state: CpuState, var machine: Machine) {
   }
 
   def runOperation(opcode: OperationCode): Int = opcode match {
-    case AAA() => ???
-    case AAD() => ???
-    case AAM() => ???
-    case AAS() => ???
-    case ADC(destination, source) => ???
+    case AAA() => ???; 4
+    case AAD() => ???; 60
+    case AAM() => ???; 84
+    case AAS() => ???; 4
+    case ADC(destination, source) => (destination, source) match {
+      case (dest: RegisterOperand, src: RegisterOperand) => ???; 3
+      case (dest: RegisterOperand, src: MemoryOperand) => ???; 9 /* + EA */
+      case (dest: MemoryOperand, src: RegisterOperand) => ???; 16 /* + EA */
+      case (dest: RegisterOperand, src: ImmediateOperand) => ???; 4
+      case (dest: MemoryOperand, src: ImmediateOperand) => ???; 17 /* + EA */
+      case (dest: AccumulatorOperand, src: ImmediateOperand) => ???; 4
+    }
     case ADD(destination, source) => ???
     case AND(destination, source) => ???
     case CALLF(proc) => ???
     case CALLN(proc) => ???
-    case CBW() => ???
-    case CLC() => ???
-    case CLD() => ???
-    case CLI() => ???
-    case CMC() => ???
+    case CBW() => ???; 2
+    case CLC() => state = state.setFlag(CF, false); 2
+    case CLD() => state = state.setFlag(DF, false); 2
+    case CLI() => state = state.setFlag(IF, false); 2
+    case CMC() => state = state.setFlag(CF, !state.getFlag(CF)); 2
     case CMP(destination, source) => ???
     case CMPSB(destination, source) => ???
     case CMPSW(destination, source) => ???
-    case CWD() => ???
-    case DAA() => ???
-    case DAS() => ???
+    case CWD() => ???; 5
+    case DAA() => ???; 4
+    case DAS() => ???; 4
     case DEC(destination) => ???
     case DIV(source) => ???
     case ENTER() => ???
     case ESC() => ???
-    case HLT() => ???
+    case HLT() => ???; 2
     case IDIV(source) => ???
     case IMUL(source) => ???
     case IN(accumulator, port) => ???
     case INC(destination) => ???
     case INT(interruptType) => ???
-    case INTO() => ???
-    case IRET() => ???
-    case JBE_JNA(shortLabel) => ???
-    case JB_JBAE_JC(shortLabel) => ???
-    case JCXZ(shortLabel) => ???
-    case JE_JZ(shortLabel) => ???
-    case JLE_JNG(shortLabel) => ???
-    case JL_JNGE(shortLabel) => ???
+    case INTO() => if (state.overflowFlag) { ???; 53 } else { 4 }
+    case IRET() => ???; 24
+    case JBE_JNA(shortLabel) => /* (CF OR ZF)=1 */ doJumpIf(shortLabel, state.carryFlag | state.zeroFlag)
+    case JB_JBAE_JC(shortLabel) => /* CF=1 */ doJumpIf(shortLabel, state.carryFlag)
+    case JCXZ(shortLabel) => /* CX = 0 */ doJumpIf(shortLabel, state.cx == M86Word(0))
+    case JE_JZ(shortLabel) => /* ZF=1 */ doJumpIf(shortLabel, state.zeroFlag)
+    case JLE_JNG(shortLabel) => /* ((SF XOR OF) OR ZF)=1 */ doJumpIf(shortLabel, (state.signFlag ^ state.overflowFlag) | state.zeroFlag)
+    case JL_JNGE(shortLabel) => /* (SF XOR OF)=1 */ doJumpIf(shortLabel, state.signFlag | state.overflowFlag)
     case JMP(target) => ???
-    case JNBE_JA(shortLabel) => ???
-    case JNB_JAE_JNC(shortLabel) => ???
-    case JNE_JNZ(shortLabel) => ???
-    case JNLE_JG(shortLabel) => ???
-    case JNL_JGE(shortLabel) => ???
-    case JNO(shortLabel) => ???
-    case JNP_JPO(shortLabel) => ???
-    case JNS(shortLabel) => ???
-    case JO(shortLabel) => ???
-    case JP_JPE(shortLabel) => ???
-    case JS(shortLabel) => ???
-    case LAHF() => ???
+    case JNBE_JA(shortLabel) => /* (CF OR ZF)=O */ doJumpIf(shortLabel, !(state.carryFlag | state.zeroFlag))
+    case JNB_JAE_JNC(shortLabel) => /* CF=O */ doJumpIf(shortLabel, !state.carryFlag)
+    case JNE_JNZ(shortLabel) => /* ZF=O */ doJumpIf(shortLabel, !state.zeroFlag)
+    case JNLE_JG(shortLabel) => /* ((SF XOR OF) OR ZF)=O */ doJumpIf(shortLabel, !((state.signFlag ^ state.overflowFlag) | state.zeroFlag))
+    case JNL_JGE(shortLabel) => /* (SF XOR OF)=O */ doJumpIf(shortLabel, !(state.signFlag ^ state.overflowFlag))
+    case JNO(shortLabel) => /* OF=O */ doJumpIf(shortLabel, !state.overflowFlag)
+    case JNP_JPO(shortLabel) => /* PF=O */ doJumpIf(shortLabel, !state.parityFlag)
+    case JNS(shortLabel) => /* SF=O */ doJumpIf(shortLabel, !state.signFlag)
+    case JO(shortLabel) => /* OF=1 */ doJumpIf(shortLabel, state.overflowFlag)
+    case JP_JPE(shortLabel) => /* PF=1 */ doJumpIf(shortLabel, state.parityFlag)
+    case JS(shortLabel) => /* SF=1 */ doJumpIf(shortLabel, state.signFlag)
+    case LAHF() => ???; 4
     case LDS(destination, source) => ???
     case LEA(destination, source) => ???
     case LEAVE() => ???
     case LES(destination, source) => ???
-    case LOCK() => ???
+    case LOCK() => ???; 2
     case LODSB(source) => ???
     case LODSW(source) => ???
-    case LOOP(shortLabel) => ???
+    case LOOP(shortLabel) => {
+      decreaseCX()
+      if (state.getRegister16(CX) != M86Word(0)) {
+        // ToDo: jump correctly
+        state.setRegister16(IP, M86Word(shortLabel.offset)); 17
+      }
+      else {
+        5
+      }
+    }
     case LOOPNZ_LOOPNE(shortLabel) => ???
     case LOOPZ_LOOPE(shortLabel) => ???
     //
@@ -123,16 +140,22 @@ class Cpu(var state: CpuState, var machine: Machine) {
     case MOVSB(destination, source) => ???
     case MOVSW(destination, source) => ???
     case MUL(source) => ???
-    case NEG(destination) => ???
-    case NOT(destination) => ???
+    case NEG(destination) => destination match {
+      case (dest: RegisterOperand) => ???; 3
+      case (dest: MemoryOperand) => ???; 16
+    }
+    case NOT(destination) => destination match {
+      case (dest: RegisterOperand) => ???; 3
+      case (dest: MemoryOperand) => ???; 16
+    }
     case OR(destination, source) => ???
     case OUT(accumulator, port) => ???
     case POP(destination) => ???
     case POPA() => ???
-    case POPF() => ???
+    case POPF() => ???; 8
     case PUSH(source) => ???
     case PUSHA() => ???
-    case PUSHF() => ???
+    case PUSHF() => ???; 10
     case RCL(destination, count) => ???
     case RCR(destination, count) => ???
     case RETF(popValue) => ???
@@ -140,7 +163,7 @@ class Cpu(var state: CpuState, var machine: Machine) {
     case ROL(destination, count) => ???
     case ROR(destination, count) => ???
     case SAAR(destination, count) => ???
-    case SAHF() => ???
+    case SAHF() => ???; 4
     case SAR() => ???
     case SBB(destination, source) => ???
     case SCASB(destination) => ???
@@ -148,17 +171,36 @@ class Cpu(var state: CpuState, var machine: Machine) {
     case SEGMENT() => ???
     case SHL_SAL(destination, count) => ???
     case SHR(destination, source) => ???
-    case STC() => ???
-    case STD() => ???
-    case STI() => ???
+    case STC() => state = state.setFlag(CF, true); 2
+    case STD() => state = state.setFlag(DF, true); 2
+    case STI() => state = state.setFlag(IF, true); 2
     case STOSB(destination) => ???
     case STOSW(destination) => ???
     case SUB(destination, source) => ???
     case TEST(destination, source) => ???
     case WAIT() => ???
     case XCHG(destination, source) => ???
-    case XLAT(translateTable) => ???
+    case XLAT(translateTable) => ???; 11
     case XOR(destination, source) => ???
+  }
+
+  def doJump(shortLabel: ShortLabelOperand): Unit = {
+    // ToDo: offset should be signed
+    state = state.setRegister16(IP, state.getRegister16(IP) + shortLabel.offset)
+  }
+
+  def doJumpIf(shortLabel: ShortLabelOperand, condition: => Boolean, valueIfTrue: Int = 16, valueIfFalse: Int = 4): Int = {
+    if (condition) {
+      doJump(shortLabel)
+      valueIfTrue
+    }
+    else {
+      valueIfFalse
+    }
+  }
+
+  def decreaseCX(): Unit = {
+    state = state.setRegister16(CX, state.getRegister16(CX) - M86Word(1))
   }
 }
 
