@@ -36,8 +36,6 @@ class IndirectAddressingDecoder(val opcodeFetcher: OpcodeFetcher) {
   private var forcedSegReg: Option[SegmentRegister] = None
   private var repeatWhileEqual: Option[Boolean] = None // true = REP/REPE/REPZ; false = REPNE/REPNZ
 
-  // def getMemAddress: Address = m_memAddress
-
   def reset(): Unit = {
     val modeByte = opcodeFetcher.nextByte()
 
