@@ -570,13 +570,40 @@ object MachineInstructionOpcode {
 
   case class CALLF(proc: FarProcOperand) extends OperationCode("Call Far", InstructionType.ControlTransfer)
 
+  /**
+    * RET (Return) transfers control from a procedure back to the instruction following the CALL that activated the
+    * procedure. The assembler generates an intrasegment RET if the programmer has defined the procedure NEAR, or an
+    * intersegment RET if the procedure has been defined as FAR. RET pops the word at the top of the stack (pointed to
+    * by register SP) into the instruction pointer and increments SP by two. If RET is intersegment, the word at the new
+    * top of stack is popped into the CS register, and SP is again incremented by two. If an optional pop value has been
+    * specified, RET adds that value to SP. This feature may be used to discard parameters pushed onto the stack before
+    * the execution of the CALL instruction.
+    */
   case class RETN(popValue: Option[Immed16Operand]) extends OperationCode("Return from CALLN", InstructionType.ControlTransfer)
 
   case class RETF(popValue: Option[Immed16Operand]) extends OperationCode("Return from CALLF", InstructionType.ControlTransfer)
 
   /**
+    * JMP unconditionally transfers control to the target location. Unlike a CALL instruction, JMP does not save any
+    * information on the stack, and no return to the instruction following the JMP is expected. Like CALL, the address
+    * of the target operand may be obtained from the instruction itself (direct JMP) or from memory or a register
+    * referenced by the instruction (indirect JMP).
     *
+    * An intrasegment direct JMP changes the instruction pointer by adding the relative displacement of the target from
+    * the JMP instruction. If the assembler can determine that the target is within 127 bytes of the JMP, it
+    * automatically generates a two-byte form of this instruction called a SHORT JMP; otherwise, it generates a NEAR JMP
+    * that can address a target within ±32k. Intrasegment direct JMPS are self-relative and are appropriate in
+    * position-independent (dynamically relocatable) routines in which the JMP and its target are in the same segment
+    * and are moved together.
     *
+    * An intrasegment indirect JMP may be made either through memory or through a 16-bit general register. In the first
+    * case, the content of the word referenced by the instruction replaces the instruction pointer. In the second case,
+    * the new IP value is taken from the register named in the instruction.
+    *
+    * An intersegment direct JMP replaces IP and CS with values contained in the instruction.
+    *
+    * An intersegment indirect JMP may be made only through memory. The first word of the doubleword pointer referenced
+    * by the instruction replaces IP, and the second word replaces CS.
     */
   case class JMP(target: LabelOperand) extends OperationCode("Unconditional Jump", InstructionType.ControlTransfer)
 
@@ -677,110 +704,135 @@ object MachineInstructionOpcode {
   case class JNS(shortLabel: ShortLabelOperand) extends OperationCode("Jump on not sign", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * LOOP decrements CX by 1 and transfers control to the target operand if CX is not 0; otherwise the instruction
+    * following LOOP is executed.
     */
   case class LOOP(shortLabel: ShortLabelOperand) extends OperationCode("Loop CX times", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * LOOPE and LOOPZ (Loop While Equal and Loop While Zero) are different mnemonics for the same instruction (similar
+    * to the REPE and REPZ repeat prefixes). CX is decremented by 1, and control is transferred to the target operand if
+    * CX is not 0 and if ZF is set; otherwise the instruction following LOOPE/LOOPZ is executed.
     */
   case class LOOPZ_LOOPE(shortLabel: ShortLabelOperand) extends OperationCode("Loop while zero/equal", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * LOOPNE and LOOPNZ (Loop While Not Equal and Loop While Not Zero) are also synonyms for the same instruction. CX is
+    * decremented by 1, and control is transferred to the target operand if ex is not 0 and if ZF is clear; otherwise
+    * the next sequential instruction is executed.
     */
   case class LOOPNZ_LOOPNE(shortLabel: ShortLabelOperand) extends OperationCode("Loop while not zero/equal", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * JeXZ (Jump If CX Zero) transfers control to the target operand if CX is O. This instruction is useful at the
+    * beginning of a loop to bypass the loop if ex has a zero value, i.e., to execute the loop zero times.
     */
   case class JCXZ(shortLabel: ShortLabelOperand) extends OperationCode("Jump on CX zero", InstructionType.ControlTransfer)
 
   /**
+    * INT (Interrupt) activates the interrupt procedure specified by the interrupt-type operand. INT decrements the
+    * stack pointer by two, pushes the flags onto the stack, and clears the trap (TF) and interrupt-enable (IF) flags to
+    * disable single-step and maskable interrupts. The flags are stored in the format used by the PUSHF instruction. SP
+    * is decremented again by two, and the es register is pushed onto the stack. The address of the interrupt pointer is
+    * calculated by multiplying interrupt-type by four; the second word of the interrupt pointer replaces CS. SP again
+    * is decremented by two, and IP is pushed onto the stack and is replaced by the first word of the interrupt pointer.
+    * If interrupt-type = 3, the assembler generates a short (1 byte) form of the instruction, known as the breakpoint
+    * interrupt.
     *
-    *
+    * Software interrupts can be used as "supervisor calls," i.e., requests for service from an operating system. A
+    * different interrupt-type can be used for each type of service that the operating system could supply for an
+    * application program. Software interrupts also may be used to check out interrupt service procedures written for
+    * hardware-initiated interrupts.
     */
   case class INT(interruptType: Byte) extends OperationCode("Interrupt", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * INTO (Interrupt on Overflow) generates a software interrupt if the overflow flag (OF) is set; otherwise control
+    * proceeds to the following instruction without activating an interrupt procedure. INTO addresses the target
+    * interrupt procedure (its type is 4) through the interrupt pointer at location IOH; it clears the TF and IF flags
+    * and otherwise operates like INT. INTO may be written following an arithmetic or logical operation to activate an
+    * interrupt procedure if overflow occurs.
     */
   case class INTO() extends OperationCode("Interrupt on overflow", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * IRET (Interrupt Return) transfers control back to the point of interruption by popping IP, CS and the flags from
+    * the stack. IRET thus affects all flags by restoring them to previously saved values. IRET is used to exit any
+    * interrupt procedure, whether activated by hardware or software.
     */
   case class IRET() extends OperationCode("Interrupt return", InstructionType.ControlTransfer)
 
   /**
-    *
-    *
+    * CLC (Clear Carry flag) zeroes the carry flag (CF) and affects no other flags. It (and CMC and STC) is useful in
+    * conjunction with the RCL and RCR instructions.
     */
   case class CLC() extends OperationCode("Clear carry", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * CMC (Complement Carry flag) "toggles" CF to its opposite state and affects no other flags.
     */
   case class CMC() extends OperationCode("Complement carry", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * STC (Set Carry flag) sets CF to 1 and affects no other flags.
     */
   case class STC() extends OperationCode("Set carry", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * CLD (Clear Direction flag) zeroes DF causing the string instructions to auto-increment the SI and/or DI index
+    * registers. CLD does not affect any other flags.
     */
   case class CLD() extends OperationCode("Clear direction", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * STD (Set Direction flag) sets DF to 1 causing the string instructions to auto-decrement the SI and/or DI index
+    * registers. STD does not affect any other flags.
     */
   case class STD() extends OperationCode("Set direction", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * CLI (Clear Interrupt-enable flag) zeroes IF. When the interrupt-enable flag is cleared, the 8086 and 8088 do not
+    * recognize an external interrupt request that appears on the INTR line; in other words maskable interrupts are
+    * disabled. A non-maskable interrupt appearing on the NMI line, however, is honored, as is a software interrupt. CLI
+    * does not affect any other flags.
     */
   case class CLI() extends OperationCode("Clear interrupt", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * STI (Set Interrupt-enable flag) sets IF to 1, enabling processor recognition of maskable interrupt requests
+    * appearing on the INTR line. Note however, that a pending interrupt will not actually be recognized until the
+    * instruction following STI has executed. STI does not affect any other flags.
     */
   case class STI() extends OperationCode("Set interrupt", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * HL T (Halt) causes the 8086/8088 to enter the halt state. The processor leaves the halt state upon activation of
+    * the RESET line, upon receipt of a non-maskable interrupt request on NMI, or, if interrupts are enabled, upon
+    * receipt of a maskable interrupt request on INTR. HL T does not affect any flags. It may be used as an alternative
+    * to an endless software loop in situations where a program must wait for an interrupt.
     */
   case class HLT() extends OperationCode("Halt", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * WAIT causes the CPU to enter the wait state while its TEST line is not active. WAIT does not affect any flags.
+    * This instruction is described more completely in section 2.5.
     */
   case class WAIT() extends OperationCode("Wait", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * ESC (Escape) provides a means for an external processor. to obtain an opcode and possibly a memory operand from
+    * the 8086 or 8088. The external opcode is a 6-bit immediate constant that the assembler encodes in the machine
+    * instruction it builds (see table 2-26). An external processor may monitor the system bus and capture this opcode
+    * when the ESC is fetched. If the source operand is a register, the processor does nothing. If the source operand
+    * is a memory variable, the processor obtains the operand from memory and discards it. An external processor may
+    * capture the memory operand when the processor reads it from memory.
     */
   case class ESC() extends OperationCode("Escape (to external device)", InstructionType.ProcessorControl)
 
   /**
-    *
-    *
+    * LOCK is a one-byte prefix that causes the 8086/8088 (configured in maximum mode) to assert its bus LOCK signal
+    * while the following instruction executes. LOCK does not affect any flags. See section 2.5 for more information on
+    * LOCK.
     */
   case class LOCK() extends OperationCode("Bus lock prefix", InstructionType.ProcessorControl)
 
